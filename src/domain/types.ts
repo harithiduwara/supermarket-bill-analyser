@@ -22,7 +22,10 @@ export interface BillItem {
   netAmount?: number;
 }
 
-export interface Tender { method: string; amount: number }
+export interface Tender {
+  method: string;
+  amount: number;
+}
 
 export interface Promotion {
   scheme: string | null;
@@ -78,4 +81,18 @@ export interface IngestResult {
   status: "added" | "duplicate" | "rejected";
   ref: string;
   checks: CheckResult[];
+}
+
+export type AuditType = "added" | "duplicate" | "rejected" | "import" | "export" | "seed";
+export type InputPath = "ebill" | "receipt" | "import" | "seed";
+
+/** Append-only record of what happened to the ledger (US-17). Informational: the
+ * ledger is local, so this is a diary, not tamper-proof evidence (see threat model). */
+export interface AuditEvent {
+  id?: number;
+  at: string; // ISO timestamp
+  type: AuditType;
+  ref?: string;
+  via?: InputPath;
+  detail?: string;
 }

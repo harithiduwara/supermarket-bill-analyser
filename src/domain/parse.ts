@@ -21,8 +21,7 @@ const SUMMARY_RE = {
   net: /Net Amount[^\d-]*([\d,]+\.\d{2})/,
 };
 const POINTS_RE = /Points earned for this bill:\s*([\d,]+\.\d+)/;
-const BALANCE_RE =
-  /Total points redeemable as at\s+\d{2}-[A-Za-z]{3}-\d{4}\s+([\d,]+\.\d+)/;
+const BALANCE_RE = /Total points redeemable as at\s+\d{2}-[A-Za-z]{3}-\d{4}\s+([\d,]+\.\d+)/;
 const TRAILING_AMOUNT_RE = /^(.*?)\s+(-?[\d,]+\.\d{2})$/;
 const LINE_PROMO_RE = /^(\d+)\s+([A-Za-z0-9]+)\s+(?:([\d.]+)%\s+)?(?:Value\s+)?Dis$/i;
 
@@ -31,12 +30,21 @@ const SKIP_LABELS =
   /Gross Amount|Promotion Discount|Net Amount|Total promotion\(s\) savings|Points earned|Total points redeemable/i;
 // a payment instrument, not a discount scheme.
 // NB the bill misspells RewardzPay as "RewadzPay" on Seylan lines.
-const TENDER_HINT =
-  /Credit Card|Debit Card|\bCash\b|Rew[a-z]*Pay|Voucher|Gift Card|\bLoyalty\b|Bank\s*-/i;
+const TENDER_HINT = /Credit Card|Debit Card|\bCash\b|Rew[a-z]*Pay|Voucher|Gift Card|\bLoyalty\b|Bank\s*-/i;
 
 const MONTHS: Record<string, number> = {
-  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-  jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+  jan: 1,
+  feb: 2,
+  mar: 3,
+  apr: 4,
+  may: 5,
+  jun: 6,
+  jul: 7,
+  aug: 8,
+  sep: 9,
+  oct: 10,
+  nov: 11,
+  dec: 12,
 };
 
 const num = (s: string): number => parseFloat(s.replace(/,/g, "").trim());
@@ -82,6 +90,7 @@ export function normaliseSummaryLines(lines: string[]): string[] {
  * parser expects. UNVERIFIED against the live digibill HTML (the host is not
  * reachable from the build sandbox and the seed holds only fetched text). If a
  * real bill fails to parse, the first fix to try is pasting the visible text. */
+/* v8 ignore start -- needs a real DOM; exercised in a browser by tests/e2e/ebill.spec.ts */
 export function htmlToText(html: string): string {
   if (!/<\w+[^>]*>/.test(html)) return html;
   const doc = new DOMParser().parseFromString(html, "text/html");
@@ -95,6 +104,7 @@ export function htmlToText(html: string): string {
   doc.querySelectorAll("br,p,div,li,h1,h2,h3,h4").forEach((n) => n.append("\n"));
   return (doc.body.textContent ?? "").replace(/\n{3,}/g, "\n\n");
 }
+/* v8 ignore stop */
 
 export function parseBill(text: string, ref: string): Bill {
   const lines = text.split(/\r?\n/).map((l) => l.replace(/\s+$/, ""));

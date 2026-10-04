@@ -1,10 +1,10 @@
 import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
-import { DexieStore } from "../src/db/db";
-import { ingestMany } from "../src/domain/ingest";
+import { DexieStore } from "../../src/db/db";
+import { ingestMany } from "../../src/domain/ingest";
 import { allSeed } from "./helpers";
 
-describe("IndexedDB store", () => {
+describe("US-03 IndexedDB store", () => {
   it("is idempotent across repeated seeding and refuses to overwrite", async () => {
     const s = new DexieStore("test-ledger");
     const seed = allSeed();

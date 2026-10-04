@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { allPass, failures, reconcile } from "../src/domain/reconcile";
-import type { Bill } from "../src/domain/types";
+import { allPass, failures, reconcile } from "../../src/domain/reconcile";
+import type { Bill } from "../../src/domain/types";
 import { allSeed } from "./helpers";
 
 const seed = allSeed();
@@ -8,7 +8,7 @@ const keells = (): Bill => structuredClone(seed.find((b) => b.ref === "FYQQRQ")!
 const glomark = (): Bill => structuredClone(seed.find((b) => b.ref === "GLO549921")!);
 const failed = (b: Bill) => failures(reconcile(b)).map((c) => c.id);
 
-describe("every seed bill passes every applicable check", () => {
+describe("US-04 every seed bill passes every applicable check", () => {
   for (const b of seed) {
     it(b.ref, () => {
       const checks = reconcile(b);
@@ -27,7 +27,7 @@ describe("every seed bill passes every applicable check", () => {
   });
 });
 
-describe("a deliberately corrupted bill is caught, with the arithmetic shown", () => {
+describe("US-04 / NFR-01 a deliberately corrupted bill is caught, with the arithmetic shown", () => {
   it("a wrong line amount fails items-equal-gross", () => {
     const b = keells();
     b.items[0].amount += 10;
@@ -79,7 +79,9 @@ describe("a deliberately corrupted bill is caught, with the arithmetic shown", (
   });
   it("tolerance is not widened: one cent passes, three cents fail", () => {
     const ok = keells();
-    ok.gross += 0.01; ok.net += 0.01; ok.items[0].amount += 0.01;
+    ok.gross += 0.01;
+    ok.net += 0.01;
+    ok.items[0].amount += 0.01;
     ok.tenders[0].amount += 0.01;
     expect(failed(ok)).not.toContain("itemsEqualGross");
     const bad = keells();

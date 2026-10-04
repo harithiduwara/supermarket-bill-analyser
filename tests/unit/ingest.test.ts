@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { exportLedger, ingest, ingestMany, receiptRef, refFromEbillUrl } from "../src/domain/ingest";
-import { MemoryStore } from "../src/domain/store";
-import type { Bill } from "../src/domain/types";
+import { exportLedger, ingest, ingestMany, receiptRef, refFromEbillUrl } from "../../src/domain/ingest";
+import { MemoryStore } from "../../src/domain/store";
+import type { Bill } from "../../src/domain/types";
 import { allSeed } from "./helpers";
 
 const seed = allSeed();
 
-describe("ingest", () => {
+describe("US-03 idempotent ingest, US-04 gate", () => {
   it("loads all 24 seed bills", async () => {
     const s = new MemoryStore();
     const r = await ingestMany(s, seed);
@@ -17,10 +17,10 @@ describe("ingest", () => {
   it("re-ingesting a bill already present changes nothing", async () => {
     const s = new MemoryStore();
     await ingestMany(s, seed);
-    const before = JSON.stringify(await exportLedger(s));
+    const before = JSON.stringify((await exportLedger(s)).bills);
     const again = await ingestMany(s, seed);
     expect(again.every((x) => x.status === "duplicate")).toBe(true);
-    expect(JSON.stringify(await exportLedger(s))).toBe(before);
+    expect(JSON.stringify((await exportLedger(s)).bills)).toBe(before);
   });
 
   it("an overlapping batch only adds the new bills", async () => {
@@ -57,5 +57,23 @@ describe("ingest", () => {
   });
   it("builds a store-prefixed receipt ref", () => {
     expect(receiptRef("glo", "546052")).toBe("GLO546052");
+  });
+});
+
+describe("US-03 in-memory store (the test double must behave like the real one)", () => {
+  it("keeps receipt photos with the bill and refuses to overwrite", async () => {
+    const s = new MemoryStore();
+    const photo = new Blob(["x"], { type: "image/png" });
+    await ingest(
+      s,
+      seed.find((b) => b.ref === "GLO549921")!,
+      { images: [photo] },
+    );
+    expect(await s.images("GLO549921")).toHaveLength(1);
+    expect(await s.images("NOPE")).toEqual([]);
+    await expect(s.add(seed[0])).resolves.toBeUndefined();
+    await expect(s.add(seed[0])).rejects.toThrow(/already in ledger/);
+    await s.setMeta("k", "v");
+    expect(await s.getMeta("k")).toBe("v");
   });
 });
