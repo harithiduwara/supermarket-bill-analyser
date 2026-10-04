@@ -1,0 +1,305 @@
+{
+  "ref": "GLO546052",
+  "source": "glomark",
+  "store": "Glomark Kottawa",
+  "store_code": "14006",
+  "date": "2026-09-02",
+  "time": "18:56",
+  "points_earned": 53.97,
+  "points_balance_printed": 195,
+  "loyalty_scheme": "Softlogic One",
+  "printed": {
+    "gross": 17655.86,
+    "discount": 3823.22,
+    "net": 13832.64
+  },
+  "tenders": [
+    {
+      "method": "Visa Credit Card-1811",
+      "amount": 13832.64
+    }
+  ],
+  "transcribed_from": "photograph of customer copy, ticket 546052 (reprint)",
+  "notes": "Softlogic One points available 195, expiring 28-Feb.",
+  "lines": [
+    {
+      "code": "113748",
+      "name": "HAPPY HEN BROWN EGG LARGE 10S",
+      "rate": 610.0,
+      "qty": 1,
+      "discount": 0.0,
+      "amount": 610.0,
+      "scheme": null
+    },
+    {
+      "code": "100219",
+      "name": "ANCHOR MILK UHT TETRA 1L",
+      "rate": 580.0,
+      "qty": 1,
+      "discount": 0.0,
+      "amount": 580.0,
+      "scheme": null
+    },
+    {
+      "code": "116118",
+      "name": "MALIBAN MILK POWDER FULL CREAM",
+      "rate": 1300.0,
+      "qty": 1,
+      "discount": 0.0,
+      "amount": 1300.0,
+      "scheme": null
+    },
+    {
+      "code": "116087",
+      "name": "LLDP WHITE (12+5)*20 Large ND",
+      "rate": 5.0,
+      "qty": 1,
+      "discount": 0.0,
+      "amount": 5.0,
+      "scheme": null
+    },
+    {
+      "code": "350020",
+      "name": "HAMBURGER BUN 2S",
+      "rate": 220.0,
+      "qty": 1,
+      "discount": 88.0,
+      "amount": 132.0,
+      "scheme": "Multiple Promotion / Item Discount 40%"
+    },
+    {
+      "code": "310129",
+      "name": "GARLIC",
+      "rate": 920.0,
+      "qty": 0.182,
+      "discount": 41.86,
+      "amount": 125.58,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "310133",
+      "name": "POTATOES",
+      "rate": 340.0,
+      "qty": 0.208,
+      "discount": 17.68,
+      "amount": 53.04,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "310069",
+      "name": "GINGER",
+      "rate": 1260.0,
+      "qty": 0.052,
+      "discount": 16.38,
+      "amount": 49.14,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "310045",
+      "name": "SALAD LEAVES",
+      "rate": 680.0,
+      "qty": 0.072,
+      "discount": 12.24,
+      "amount": 36.72,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "310128",
+      "name": "BIG ONIONS",
+      "rate": 330.0,
+      "qty": 0.374,
+      "discount": 30.86,
+      "amount": 92.56,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "113147",
+      "name": "HIGHLAND ICE CREAM CHOCALATE 1L",
+      "rate": 750.0,
+      "qty": 1,
+      "discount": 187.5,
+      "amount": 562.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "113146",
+      "name": "HIGHLAND ICE CREAM VANILA 1L",
+      "rate": 700.0,
+      "qty": 1,
+      "discount": 175.0,
+      "amount": 525.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "116147",
+      "name": "SUNLIGHT CARE DETERGENT LIQUID",
+      "rate": 750.0,
+      "qty": 1,
+      "discount": 187.5,
+      "amount": 562.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "120765",
+      "name": "KIST RIDE CLASSIC FORMULATED C",
+      "rate": 350.0,
+      "qty": 2,
+      "discount": 175.0,
+      "amount": 525.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "100495",
+      "name": "ZESTA TEA 190G",
+      "rate": 700.0,
+      "qty": 1,
+      "discount": 175.0,
+      "amount": 525.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "124012",
+      "name": "EDINBOROUGH EGG MAYONNIASE 180",
+      "rate": 725.0,
+      "qty": 1,
+      "discount": 181.25,
+      "amount": 543.75,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "100740",
+      "name": "ANCHOR BUTTER UNSALTED 227G",
+      "rate": 1390.0,
+      "qty": 1,
+      "discount": 347.5,
+      "amount": 1042.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "112326",
+      "name": "BABY CHERAMY CARE BABY SOAP EC",
+      "rate": 710.0,
+      "qty": 1,
+      "discount": 177.5,
+      "amount": 532.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "100313",
+      "name": "DILMAH GREEN TEA PURE CEYLON 2",
+      "rate": 500.0,
+      "qty": 1,
+      "discount": 125.0,
+      "amount": 375.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "113303",
+      "name": "PUSSALLA CHICKEN SAUSAGE DAYIY",
+      "rate": 550.0,
+      "qty": 1,
+      "discount": 137.5,
+      "amount": 412.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "114932",
+      "name": "BLACK & GOLD POP CORN 200G",
+      "rate": 340.0,
+      "qty": 1,
+      "discount": 85.0,
+      "amount": 255.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "114932",
+      "name": "BLACK & GOLD POP CORN 200G",
+      "rate": 340.0,
+      "qty": 1,
+      "discount": 85.0,
+      "amount": 255.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "310093",
+      "name": "PUMPKIN",
+      "rate": 210.0,
+      "qty": 0.38,
+      "discount": 19.95,
+      "amount": 59.85,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "114838",
+      "name": "MUNCHEE SUPER CREAM CRACKER 12",
+      "rate": 140.0,
+      "qty": 1,
+      "discount": 35.0,
+      "amount": 105.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "117611",
+      "name": "KOTMALE SPREAD CHEESE 175G",
+      "rate": 920.0,
+      "qty": 1,
+      "discount": 230.0,
+      "amount": 690.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "116399",
+      "name": "KOTMALE STIRRED YOGHURT STRWBE",
+      "rate": 150.0,
+      "qty": 2,
+      "discount": 75.0,
+      "amount": 225.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "114233",
+      "name": "DIAMOND TUNA IN SUNFLOWER OIL",
+      "rate": 750.0,
+      "qty": 1,
+      "discount": 187.5,
+      "amount": 562.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "113299",
+      "name": "PUSSALLA CHICKEN SAUSAGE SKIN",
+      "rate": 990.0,
+      "qty": 1,
+      "discount": 247.5,
+      "amount": 742.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "116951",
+      "name": "EDINBOROUGH MUSTARD CREAM 165G",
+      "rate": 380.0,
+      "qty": 1,
+      "discount": 95.0,
+      "amount": 285.0,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "117772",
+      "name": "KHAO SHONG AGGLOMERATED INSTAN",
+      "rate": 1970.0,
+      "qty": 1,
+      "discount": 492.5,
+      "amount": 1477.5,
+      "scheme": "Glomark Power Hours 25%"
+    },
+    {
+      "code": "126445",
+      "name": "NEW BEGINNINGS CREAM CHEESE 12",
+      "rate": 780.0,
+      "qty": 1,
+      "discount": 195.0,
+      "amount": 585.0,
+      "scheme": "Glomark Power Hours 25%"
+    }
+  ]
+}

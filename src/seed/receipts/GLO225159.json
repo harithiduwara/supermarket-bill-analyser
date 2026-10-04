@@ -1,0 +1,152 @@
+{
+  "ref": "GLO225159",
+  "source": "glomark",
+  "store": "Glomark Kottawa",
+  "store_code": "14006",
+  "date": "2026-09-12",
+  "time": "19:49",
+  "points_earned": 30.26,
+  "points_balance_printed": 245,
+  "loyalty_scheme": "Softlogic One",
+  "printed": {
+    "gross": 12132.0,
+    "discount": 3030.5,
+    "net": 9101.5
+  },
+  "tenders": [
+    {
+      "method": "Visa Credit Card-**70",
+      "amount": 9101.5
+    }
+  ],
+  "transcribed_from": "photograph of customer copy, ticket 225159, register R/7",
+  "notes": "Discount ran as BANK PROMOTION - SEYLAN CC25%, not Power Hours. Softlogic One points available 245, expiring 28-Feb.",
+  "lines": [
+    {
+      "code": "116087",
+      "name": "LLDP WHITE (12+5)*20 Large ND",
+      "rate": 5.0,
+      "qty": 2,
+      "discount": 0.0,
+      "amount": 10.0,
+      "scheme": null
+    },
+    {
+      "code": "100608",
+      "name": "PELWATTA BUTTER SALTED 200G",
+      "rate": 950.0,
+      "qty": 5,
+      "discount": 1187.5,
+      "amount": 3562.5,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "117428",
+      "name": "ANODS COCOA MILK CHOCOLATE BUT",
+      "rate": 800.0,
+      "qty": 1,
+      "discount": 200.0,
+      "amount": 600.0,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "121973",
+      "name": "DELMEGE VANILLA ESSENCE 28ML",
+      "rate": 220.0,
+      "qty": 1,
+      "discount": 55.0,
+      "amount": 165.0,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "124680",
+      "name": "VIM LIME FRESH REFILL POUCH 50",
+      "rate": 350.0,
+      "qty": 1,
+      "discount": 87.5,
+      "amount": 262.5,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "126356",
+      "name": "LYSOL CITRUS ALL PURPOSE CLEAN",
+      "rate": 585.0,
+      "qty": 1,
+      "discount": 146.25,
+      "amount": 438.75,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "112085",
+      "name": "LIFEBUOY HAND WASH REFIL KTCHN",
+      "rate": 350.0,
+      "qty": 1,
+      "discount": 87.5,
+      "amount": 262.5,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "113279",
+      "name": "EH PORK LINGUS 300G",
+      "rate": 1420.0,
+      "qty": 1,
+      "discount": 355.0,
+      "amount": 1065.0,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "113386",
+      "name": "FARM FRESH FRENCH FRIES 250G",
+      "rate": 660.0,
+      "qty": 1,
+      "discount": 165.0,
+      "amount": 495.0,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "100641",
+      "name": "HIGHLAND SET YOGHURT 80G",
+      "rate": 80.0,
+      "qty": 4,
+      "discount": 80.0,
+      "amount": 240.0,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "124321",
+      "name": "SUN UP COCONUT OIL 1000ML",
+      "rate": 1750.0,
+      "qty": 1,
+      "discount": 437.5,
+      "amount": 1312.5,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "122692",
+      "name": "SMAK HOT & SPICY MIXTURE 80G",
+      "rate": 280.0,
+      "qty": 1,
+      "discount": 70.0,
+      "amount": 210.0,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "113461",
+      "name": "SETHUM SEMOLINA 500G",
+      "rate": 387.0,
+      "qty": 1,
+      "discount": 96.75,
+      "amount": 290.25,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    },
+    {
+      "code": "126610",
+      "name": "BAULI MOONFILS CROISSANT VANIL",
+      "rate": 250.0,
+      "qty": 1,
+      "discount": 62.5,
+      "amount": 187.5,
+      "scheme": "Bank Promotion - Seylan CC 25%"
+    }
+  ]
+}
