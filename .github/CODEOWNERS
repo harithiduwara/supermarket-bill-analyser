@@ -1,0 +1,4 @@
+# Domain rules and reconciliation decide whether a number can be trusted: always reviewed.
+*                       @harithiduwara
+/src/domain/            @harithiduwara
+/docs/                  @harithiduwara
