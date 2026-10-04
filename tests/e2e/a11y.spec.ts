@@ -1,11 +1,30 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { openApp, PNG, lbl } from "./helpers";
+import { allSeed } from "../unit/helpers";
+import { openApp, PNG, lbl, workbookFile } from "./helpers";
 
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 const routes: { name: string; hash: string; prepare?: (p: Page) => Promise<void> }[] = [
-  { name: "ledger", hash: "#/" },
+  { name: "workbook", hash: "#/" },
+  {
+    name: "workbook with import reports (ok, conflict, rejected, refused file)",
+    hash: "#/",
+    prepare: async (p) => {
+      const seed = allSeed();
+      const bad = { ...structuredClone(seed[0]), ref: "EDIT01", net: seed[0].net + 100 };
+      const changed = { ...structuredClone(seed[1]), store: "Edited store" };
+      await p
+        .locator('.dropzone input[type="file"]')
+        .setInputFiles([
+          await workbookFile(),
+          { ...(await workbookFile([bad, changed])), name: "edited.xlsx" },
+          { name: "nope.xlsx", mimeType: "text/plain", buffer: Buffer.from("not a workbook") },
+        ]);
+      await p.getByText("nope.xlsx was not imported").waitFor();
+    },
+  },
+  { name: "ledger", hash: "#/ledger" },
   { name: "bill", hash: "#/bill/FYQQRQ" },
   { name: "glomark bill", hash: "#/bill/GLO549921" },
   { name: "add e-bill", hash: "#/add/ebill" },

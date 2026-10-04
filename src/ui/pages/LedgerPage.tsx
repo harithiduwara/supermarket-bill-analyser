@@ -62,8 +62,8 @@ export function LedgerPage() {
 
       {remindBackup && (
         <div className="banner info" role="note">
-          <strong>Back up your ledger.</strong> It lives only in this browser, and there is no export from the
-          last 14 days. <a href={href.settings}>Export now</a>
+          <strong>Update your workbook.</strong> It has been over 14 days since you added bills that are not
+          in an exported workbook. <a href={href.workbook}>Export now</a>
         </div>
       )}
       {t.failing > 0 && (

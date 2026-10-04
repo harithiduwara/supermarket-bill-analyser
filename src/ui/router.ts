@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react";
 /** Hash routing: works on GitHub Pages without server rewrites, gives every screen a stable link,
  * and makes the browser Back button behave. */
 export type Route =
+  | { name: "workbook" }
   | { name: "ledger" }
   | { name: "bill"; ref: string }
   | { name: "ebill" }
@@ -14,7 +15,8 @@ export type Route =
 export function parseHash(hash: string): Route {
   const path = hash.replace(/^#\/?/, "").replace(/\/+$/, "");
   const [a, b] = path.split("/");
-  if (path === "" || a === "ledger") return { name: "ledger" };
+  if (path === "" || a === "workbook") return { name: "workbook" };
+  if (a === "ledger") return { name: "ledger" };
   if (a === "bill" && b) {
     try {
       return { name: "bill", ref: decodeURIComponent(b) };
@@ -30,7 +32,8 @@ export function parseHash(hash: string): Route {
 }
 
 export const href = {
-  ledger: "#/",
+  workbook: "#/",
+  ledger: "#/ledger",
   bill: (ref: string) => `#/bill/${encodeURIComponent(ref)}`,
   ebill: "#/add/ebill",
   receipt: "#/add/receipt",

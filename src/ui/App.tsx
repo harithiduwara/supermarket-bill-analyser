@@ -12,10 +12,12 @@ import { ActivityPage } from "./pages/ActivityPage";
 import { BillPage } from "./pages/BillPage";
 import { EbillPage } from "./pages/EbillPage";
 import { LedgerPage } from "./pages/LedgerPage";
+import { WorkbookPage } from "./pages/WorkbookPage";
 import { ReceiptPage } from "./pages/ReceiptPage";
 import { SettingsPage } from "./pages/SettingsPage";
 
 const NAV: { to: string; label: string; short: string; match: Route["name"][] }[] = [
+  { to: href.workbook, label: "Workbook", short: "Workbook", match: ["workbook"] },
   { to: href.ledger, label: "Ledger", short: "Ledger", match: ["ledger", "bill"] },
   { to: href.receipt, label: "Add receipt", short: "Receipt", match: ["receipt"] },
   { to: href.ebill, label: "Add e-bill", short: "E-bill", match: ["ebill"] },
@@ -24,6 +26,7 @@ const NAV: { to: string; label: string; short: string; match: Route["name"][] }[
 ];
 
 const TITLES: Record<Route["name"], string> = {
+  workbook: "Workbook",
   ledger: "Ledger",
   bill: "Bill",
   ebill: "Add Keells e-bill",
@@ -112,7 +115,7 @@ function Shell() {
       </a>
       <header className="topbar">
         <div className="topbar-in">
-          <a className="brand" href={href.ledger}>
+          <a className="brand" href={href.workbook}>
             Grocery ledger
           </a>
           <nav className="primary" aria-label="Primary">
@@ -138,6 +141,7 @@ function Shell() {
           )
         ) : (
           <AppContext.Provider value={ctx}>
+            {route.name === "workbook" && <WorkbookPage onChanged={afterSave} />}
             {route.name === "ledger" && <LedgerPage />}
             {route.name === "bill" && <BillPage billRef={route.ref} />}
             {route.name === "ebill" && <EbillPage onSaved={afterSave} />}

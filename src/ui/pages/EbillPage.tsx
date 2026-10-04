@@ -144,6 +144,7 @@ export function EbillPage({ onSaved }: { onSaved: () => Promise<void> }) {
           {result?.status === "added" && (
             <div className="banner ok" role="status">
               Saved <strong>{result.ref}</strong>. <a href={href.bill(result.ref)}>View the bill</a> ·{" "}
+              <a href={href.workbook}>Export your workbook</a> ·{" "}
               <button className="btn small" onClick={reset}>
                 Add another
               </button>

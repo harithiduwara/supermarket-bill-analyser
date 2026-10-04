@@ -7,7 +7,7 @@ test.describe("US-06 backup and restore", () => {
     await openApp(page, "#/settings");
     const [dl] = await Promise.all([
       page.waitForEvent("download"),
-      page.getByRole("button", { name: /Export ledger/ }).click(),
+      page.getByRole("button", { name: /Export JSON backup/ }).click(),
     ]);
     const file = await dl.path();
     const json = JSON.parse(fs.readFileSync(file!, "utf8"));

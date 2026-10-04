@@ -8,7 +8,7 @@ import { expect, type Page, type Route } from "@playwright/test";
 export const rawBill = (ref: string): string =>
   fs.readFileSync(path.resolve(here, "../../src/seed/raw", `${ref}.md`), "utf8");
 
-export async function openApp(page: Page, hash = "#/"): Promise<void> {
+export async function openApp(page: Page, hash = "#/ledger"): Promise<void> {
   await page.goto(`/${hash}`);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByText("Loading your ledger")).toHaveCount(0);
@@ -65,4 +65,23 @@ export async function mockAnthropic(page: Page, replies: object[]): Promise<{ ca
     });
   });
   return { calls: () => n };
+}
+
+import { buildWorkbook } from "../../src/export/xlsx";
+import type { Bill } from "../../src/domain/types";
+import { allSeed } from "../unit/helpers";
+
+/** A real workbook, built by the app's own exporter, for tests that need a file to import. */
+export async function workbookFile(
+  bills: Bill[] = allSeed(),
+): Promise<{ name: string; mimeType: string; buffer: Buffer }> {
+  const data = await buildWorkbook(bills, {
+    exportedAt: new Date("2026-10-04T10:00:00Z"),
+    appVersion: "test",
+  });
+  return {
+    name: "grocery-ledger-2026-10-04.xlsx",
+    mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    buffer: Buffer.from(data),
+  };
 }

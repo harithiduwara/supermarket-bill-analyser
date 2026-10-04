@@ -22,7 +22,15 @@ test.describe("NFR-04 content security policy", () => {
       if (m.type() === "error") problems.push(m.text());
     });
     page.on("pageerror", (e) => problems.push(String(e)));
-    for (const h of ["#/", "#/bill/FYQQRQ", "#/add/ebill", "#/add/receipt", "#/activity", "#/settings"]) {
+    for (const h of [
+      "#/",
+      "#/ledger",
+      "#/bill/FYQQRQ",
+      "#/add/ebill",
+      "#/add/receipt",
+      "#/activity",
+      "#/settings",
+    ]) {
       await openApp(page, h);
     }
     await page.getByRole("link", { name: "Add receipt" }).click();
@@ -36,7 +44,8 @@ test.describe("NFR-04 content security policy", () => {
       const u = new URL(r.url());
       if (!["localhost", ""].includes(u.hostname) && u.protocol.startsWith("http")) external.push(r.url());
     });
-    for (const h of ["#/", "#/bill/FYQQRQ", "#/add/receipt", "#/settings"]) await openApp(page, h);
+    for (const h of ["#/", "#/ledger", "#/bill/FYQQRQ", "#/add/receipt", "#/settings"])
+      await openApp(page, h);
     expect(external).toEqual([]);
   });
 

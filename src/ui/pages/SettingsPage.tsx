@@ -7,6 +7,7 @@ import { Field } from "../components/Field";
 import { PageHeader } from "../components/PageHeader";
 import { useApp } from "../context";
 import { fmtDateTime } from "../format";
+import { href } from "../router";
 
 const mb = (n: number | null) => (n === null ? "unknown" : `${(n / 1024 / 1024).toFixed(1)} MB`);
 const DOCS = "https://github.com/harithiduwara/supermarket-bill-analyser/tree/main/docs";
@@ -71,6 +72,11 @@ export function SettingsPage({ onChanged }: { onChanged: () => Promise<void> }) 
       <section className="card" aria-labelledby="bk">
         <h2 id="bk">Backup</h2>
         <p>
+          <strong>The Excel workbook is your backup.</strong> Export and import it on the{" "}
+          <a href={href.workbook}>Workbook</a> page. The JSON file below is an alternative for developers and
+          advanced use.
+        </p>
+        <p>
           {bills.length} bills in this browser.{" "}
           {lastExport ? (
             <>
@@ -84,10 +90,10 @@ export function SettingsPage({ onChanged }: { onChanged: () => Promise<void> }) 
         </p>
         <div className="row">
           <button className="btn primary" onClick={doExport} disabled={bills.length === 0}>
-            Export ledger (JSON)
+            Export JSON backup
           </button>
           <button className="btn" onClick={() => fileInput.current?.click()}>
-            Import ledger…
+            Import JSON backup…
           </button>
           <input
             ref={fileInput}
