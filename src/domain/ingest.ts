@@ -1,6 +1,7 @@
 /** The single ingest path every input goes through (design rules 2 and 3):
  * e-bill, photo receipt, backup import, seed. */
 import { allPass, failures, reconcile } from "./reconcile";
+import { canonical } from "./workbook";
 import type { LedgerStore } from "./store";
 import type { Bill, IngestResult, InputPath } from "./types";
 
@@ -87,28 +88,51 @@ export async function exportLedger(store: LedgerStore, now: Date = new Date()): 
 export interface ImportSummary {
   added: number;
   duplicate: number;
+  /** already in the ledger, but the file's copy differs: the ledger copy was kept (never overwritten) */
+  conflicts: string[];
   /** passed validation but failed reconciliation */
   rejected: { ref: string; failing: string[] }[];
-  /** failed validation (shape/size) */
+  /** failed validation (shape/size) or could not be read */
   invalid: { index: number; ref: string | null; reason: string }[];
 }
 
-/** Throws (with a user-readable reason) if the file as a whole is unusable. Changes nothing in that case. */
-export async function importLedger(store: LedgerStore, raw: string): Promise<ImportSummary> {
+/** The one merge path for backup files and workbooks. Bills are validated, then pushed through ingest(), so the
+ * reconciliation gate and idempotency apply exactly as for a bill typed in by hand. */
+export async function importBills(
+  store: LedgerStore,
+  raw: unknown[],
+  priorInvalid: ImportSummary["invalid"] = [],
+): Promise<ImportSummary> {
   // Loaded on demand: the validator (zod) is only needed when a file is imported, and keeps it out of the main bundle.
-  const { parseLedgerFile } = await import("./validate");
-  const { bills, invalid } = parseLedgerFile(raw);
-  const summary: ImportSummary = { added: 0, duplicate: 0, rejected: [], invalid };
+  const { validateBills } = await import("./validate");
+  const { bills, invalid } = validateBills(raw);
+  const summary: ImportSummary = {
+    added: 0,
+    duplicate: 0,
+    conflicts: [],
+    rejected: [],
+    invalid: [...priorInvalid, ...invalid],
+  };
   for (const b of bills) {
     const r = await ingest(store, b, { via: "import", silent: true });
     if (r.status === "added") summary.added++;
-    else if (r.status === "duplicate") summary.duplicate++;
-    else summary.rejected.push({ ref: r.ref, failing: failures(r.checks).map((c) => c.label) });
+    else if (r.status === "duplicate") {
+      summary.duplicate++;
+      const have = await store.get(b.ref);
+      if (have && canonical(have) !== canonical(b)) summary.conflicts.push(b.ref);
+    } else summary.rejected.push({ ref: r.ref, failing: failures(r.checks).map((c) => c.label) });
   }
-  await store.log({
-    type: "import",
-    via: "import",
-    detail: `${summary.added} added, ${summary.duplicate} already present, ${summary.rejected.length} failed checks, ${summary.invalid.length} invalid`,
-  });
+  return summary;
+}
+
+export const describeImport = (s: ImportSummary): string =>
+  `${s.added} added, ${s.duplicate} already present${s.conflicts.length ? ` (${s.conflicts.length} differ from the ledger copy, ledger kept)` : ""}, ${s.rejected.length} failed checks, ${s.invalid.length} invalid`;
+
+/** JSON backup. Throws (with a user-readable reason) if the file as a whole is unusable; changes nothing then. */
+export async function importLedger(store: LedgerStore, raw: string): Promise<ImportSummary> {
+  const { parseLedgerFile } = await import("./validate");
+  const { bills, invalid } = parseLedgerFile(raw);
+  const summary = await importBills(store, bills, invalid);
+  await store.log({ type: "import", via: "import", detail: describeImport(summary) });
   return summary;
 }

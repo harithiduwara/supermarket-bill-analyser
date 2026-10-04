@@ -46,7 +46,7 @@ export default defineConfig({
     include: ["tests/unit/**/*.test.ts"],
     coverage: {
       provider: "v8",
-      include: ["src/domain/**", "src/settings.ts"],
+      include: ["src/domain/**", "src/export/**", "src/settings.ts"],
       reporter: ["text-summary", "lcov"],
       thresholds: { lines: 90, functions: 90, statements: 90, branches: 80 },
     },

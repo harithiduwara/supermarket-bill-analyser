@@ -87,9 +87,14 @@ export function parseLedgerFile(raw: string): ParsedLedgerFile {
   const file = fileSchema.safeParse(json);
   if (!file.success) throw new Error("not a ledger export (expected { version: 1, bills: [...] })");
 
+  return validateBills(file.data.bills);
+}
+
+/** Shape/size validation of bill objects from ANY untrusted source (JSON backup, workbook). */
+export function validateBills(raw: unknown[]): ParsedLedgerFile {
   const bills: Bill[] = [];
   const invalid: ParsedLedgerFile["invalid"] = [];
-  file.data.bills.forEach((b, index) => {
+  raw.forEach((b, index) => {
     const r = billSchema.safeParse(b);
     if (r.success) bills.push(r.data as Bill);
     else {

@@ -1,10 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseBill } from "../../src/domain/parse";
 import { buildReceipt, type ReceiptInput } from "../../src/domain/receipt";
 import type { Bill } from "../../src/domain/types";
 
-const root = path.resolve(__dirname, "../..");
+// import.meta.url (not __dirname) so these helpers load under both Vitest and Playwright
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 export const ledger: { bills: Record<string, any> } = JSON.parse(
   fs.readFileSync(path.join(root, "tests/fixtures/ledger.json"), "utf8"),
 );

@@ -93,13 +93,17 @@ export function backupDue(unexportedSince: Date | null, now: Date = new Date(), 
   return now.getTime() - unexportedSince.getTime() > days * 86_400_000;
 }
 
+/** An event that actually changed the ledger: a bill added, or an import that added at least one. */
+const isChange = (e: { type: string; detail?: string }): boolean =>
+  e.type === "added" || (e.type === "import" && !/(^|[ :])0 added\b/.test(e.detail ?? ""));
+
 /** Oldest user change (added/import) after the last export; null if everything is exported. */
 export function oldestUnexportedChange(
-  events: { type: string; at: string }[],
+  events: { type: string; at: string; detail?: string }[],
   lastExport: Date | null,
 ): Date | null {
   const times = events
-    .filter((e) => e.type === "added" || e.type === "import")
+    .filter(isChange)
     .map((e) => new Date(e.at))
     .filter((d) => !lastExport || d > lastExport)
     .sort((a, b) => a.getTime() - b.getTime());
