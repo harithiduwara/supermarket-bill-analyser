@@ -86,25 +86,42 @@ export function normaliseSummaryLines(lines: string[]): string[] {
   return out;
 }
 
-/** Best-effort conversion of a pasted page's HTML to the pipe-table text the
- * parser expects. UNVERIFIED against the live digibill HTML (the host is not
- * reachable from the build sandbox and the seed holds only fetched text). If a
- * real bill fails to parse, the first fix to try is pasting the visible text. */
-/* v8 ignore start -- needs a real DOM; exercised in a browser by tests/e2e/ebill.spec.ts */
-export function htmlToText(html: string): string {
-  if (!/<\w+[^>]*>/.test(html)) return html;
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  doc.querySelectorAll("script,style").forEach((n) => n.remove());
-  doc.querySelectorAll("tr").forEach((tr) => {
-    const cells = [...tr.querySelectorAll("th,td")].map((c) =>
-      (c.textContent ?? "").replace(/\s+/g, " ").trim(),
-    );
-    tr.textContent = `| ${cells.join(" | ")} |\n`;
+/** Pasted pages larger than this are refused: a bill page is a few kilobytes, and the converter below scans the text. */
+export const MAX_PASTE_CHARS = 2_000_000;
+
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+const decodeEntities = (t: string): string =>
+  t.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (m, e: string) => {
+    if (e[0] === "#") {
+      const code = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
+    }
+    return ENTITIES[e.toLowerCase()] ?? m;
   });
-  doc.querySelectorAll("br,p,div,li,h1,h2,h3,h4").forEach((n) => n.append("\n"));
-  return (doc.body.textContent ?? "").replace(/\n{3,}/g, "\n\n");
+const stripTags = (t: string): string => t.replace(/<[^>]*>/g, "");
+
+/** Best-effort conversion of a pasted page's HTML to the pipe-table text the parser expects.
+ *
+ * Plain string handling — no DOM and no HTML parser — so the pasted text is never interpreted as markup, the
+ * function runs in Node as well as the browser, and it is unit-tested against every saved bill.
+ * UNVERIFIED against the live digibill HTML (the host is not reachable from the build sandbox and the seed holds
+ * only fetched text). If a real bill fails to parse, the first fix to try is pasting the visible text. */
+export function htmlToText(html: string): string {
+  if (html.length > MAX_PASTE_CHARS) throw new Error("the pasted page is too large to be a bill");
+  if (!/<\w+[^>]*>/.test(html)) return html;
+  const s = html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<(script|style|head)\b[\s\S]*?<\/\1\s*>/gi, "")
+    // a table row becomes one "| cell | cell |" line, as in the saved e-bill text
+    .replace(/<tr\b[^>]*>([\s\S]*?)<\/tr\s*>/gi, (_m, row: string) => {
+      const cells = [...row.matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]\s*>/gi)].map((c) =>
+        decodeEntities(stripTags(c[1])).replace(/\s+/g, " ").trim(),
+      );
+      return `\n| ${cells.join(" | ")} |\n`;
+    })
+    .replace(/<br\s*\/?>|<\/(p|div|li|h[1-6]|section|ul|ol|table)\s*>/gi, "\n");
+  return decodeEntities(stripTags(s)).replace(/\n{3,}/g, "\n\n");
 }
-/* v8 ignore stop */
 
 export function parseBill(text: string, ref: string): Bill {
   const lines = text.split(/\r?\n/).map((l) => l.replace(/\s+$/, ""));
