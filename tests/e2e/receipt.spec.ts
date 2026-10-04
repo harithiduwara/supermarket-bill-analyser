@@ -221,4 +221,18 @@ test.describe("US-02 photo receipt with confirmation", () => {
     await expect(page.getByText(/Anthropic API 401/)).toBeVisible();
     await expect(page.getByRole("heading", { name: "Receipt details" })).toHaveCount(0);
   });
+
+  test("an SVG (or any non-raster file) is refused with a reason and never shown", async ({ page }) => {
+    await openApp(page, "#/add/receipt");
+    await page.locator('.dropzone input[type="file"]').setInputFiles({
+      name: "evil.svg",
+      mimeType: "image/svg+xml",
+      buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>'),
+    });
+    await expect(
+      page.getByRole("alert").filter({ hasText: "Only JPEG, PNG, WebP or GIF photos can be added." }),
+    ).toBeVisible();
+    await expect(page.getByRole("list", { name: "Selected photos" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Read/ })).toBeDisabled();
+  });
 });

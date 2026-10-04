@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { blobSrc } from "../../domain/images";
 
 /** Shows the receipt photo(s) beside the editable table: verifying a transcription means looking at the original. */
 export function PhotoViewer({ files }: { files: Blob[] }) {
@@ -19,7 +20,11 @@ export function PhotoViewer({ files }: { files: Blob[] }) {
       {/* A scrollable region must be keyboard-focusable so keyboard users can pan a zoomed photo (WCAG 2.1.1). */}
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
       <div className="frame" tabIndex={0} role="region" aria-label="Scrollable receipt image">
-        <img className={zoom ? "zoom" : ""} src={urls[current]} alt={`Receipt, page ${current + 1}`} />
+        <img
+          className={zoom ? "zoom" : ""}
+          src={blobSrc(urls[current])}
+          alt={`Receipt, page ${current + 1}`}
+        />
       </div>
       {urls.length > 1 && (
         <div className="thumbs">
@@ -31,7 +36,7 @@ export function PhotoViewer({ files }: { files: Blob[] }) {
                 aria-label={`Show photo ${i + 1}`}
                 onClick={() => setIdx(i)}
               >
-                <img src={u} alt="" />
+                <img src={blobSrc(u)} alt="" />
               </button>
             </div>
           ))}

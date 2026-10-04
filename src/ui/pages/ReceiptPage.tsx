@@ -8,6 +8,7 @@ import {
   parseNum,
   type ReceiptDraft,
 } from "../../domain/draft";
+import { isRasterImage, RASTER_MESSAGE, blobSrc } from "../../domain/images";
 import { ingest } from "../../domain/ingest";
 import { mergeDrafts, transcribeImage, type OcrDraft } from "../../domain/ocr";
 import type { IngestResult } from "../../domain/types";
@@ -46,8 +47,8 @@ export function ReceiptPage({ onSaved }: { onSaved: () => Promise<void> }) {
   const badNum = (v: string) => (started && parseNum(v) === null ? "Enter a number" : undefined);
 
   const addFiles = (list: FileList | File[]) => {
-    const imgs = [...list].filter((f) => f.type.startsWith("image/"));
-    if (imgs.length < [...list].length) toast("Only image files can be added.", "bad");
+    const imgs = [...list].filter(isRasterImage);
+    if (imgs.length < [...list].length) toast(RASTER_MESSAGE, "bad");
     setFiles((p) => [...p, ...imgs]);
   };
 
@@ -139,7 +140,7 @@ export function ReceiptPage({ onSaved }: { onSaved: () => Promise<void> }) {
                 <div className="muted small">or drop them here</div>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
                   multiple
                   onChange={(e) => {
                     if (e.target.files) addFiles(e.target.files);
@@ -481,7 +482,11 @@ function PhotoStrip({ files, onRemove }: { files: File[]; onRemove: (i: number) 
     <ul className="thumbs" style={{ listStyle: "none", padding: 0 }} aria-label="Selected photos">
       {files.map((f, i) => (
         <li className="thumb" key={`${f.name}-${i}`}>
-          <img src={urls[i]} alt={`Page ${i + 1}: ${f.name}`} onLoad={() => URL.revokeObjectURL(urls[i])} />
+          <img
+            src={blobSrc(urls[i])}
+            alt={`Page ${i + 1}: ${f.name}`}
+            onLoad={() => URL.revokeObjectURL(urls[i])}
+          />
           <button className="remove" aria-label={`Remove photo ${i + 1}`} onClick={() => onRemove(i)}>
             ✕
           </button>
