@@ -1,0 +1,323 @@
+{
+  "ref": "GLO549921",
+  "source": "glomark",
+  "store": "Glomark Kottawa",
+  "store_code": "14006",
+  "date": "2026-09-24",
+  "time": "22:40",
+  "points_earned": 69.73,
+  "points_balance_printed": 270,
+  "loyalty_scheme": "Softlogic One",
+  "printed": {
+    "gross": 17669.77,
+    "discount": 2500.0,
+    "net": 15169.77
+  },
+  "tenders": [
+    {
+      "method": "Visa Credit Card-**11",
+      "amount": 15169.77
+    }
+  ],
+  "transcribed_from": "photograph of customer copy, ticket 549921, register R/3",
+  "notes": "CAP OBSERVED. 32 of 33 discounted lines took exactly 25%; line 21 (SOUL CHOCOLATE MILK DRINK) was truncated to 15.62% so the bill total landed on exactly Rs 2,500.00. Uncapped 25% would have been 2,641.66, so Rs 141.66 was withheld. Chicken (dept 340), UHT milk, coconut and eggs were excluded from the promotion entirely. Softlogic One points available 270, expiring 28-Feb.",
+  "lines": [
+    {
+      "code": "340016",
+      "name": "CHICKEN BREAST",
+      "rate": 1910.0,
+      "qty": 1.74,
+      "discount": 0.0,
+      "amount": 3323.4,
+      "scheme": null
+    },
+    {
+      "code": "340011",
+      "name": "CHICKEN WHOLE LEGS S/O",
+      "rate": 1610.0,
+      "qty": 1.016,
+      "discount": 0.0,
+      "amount": 1635.76,
+      "scheme": null
+    },
+    {
+      "code": "100357",
+      "name": "HIGHLAND MILK FULL CREAM U H T",
+      "rate": 230.0,
+      "qty": 6,
+      "discount": 0.0,
+      "amount": 1380.0,
+      "scheme": null
+    },
+    {
+      "code": "310310",
+      "name": "COCONUT",
+      "rate": 169.0,
+      "qty": 1,
+      "discount": 0.0,
+      "amount": 169.0,
+      "scheme": null
+    },
+    {
+      "code": "120253",
+      "name": "HAPPY HEN EGG MEDIUM 10S",
+      "rate": 595.0,
+      "qty": 1,
+      "discount": 0.0,
+      "amount": 595.0,
+      "scheme": null
+    },
+    {
+      "code": "125283",
+      "name": "PUSSALLA COCKTAIL MIX 350G",
+      "rate": 980.0,
+      "qty": 1,
+      "discount": 245.0,
+      "amount": 735.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "113303",
+      "name": "PUSSALLA CHICKEN SAUSAGE DAYIY",
+      "rate": 550.0,
+      "qty": 1,
+      "discount": 137.5,
+      "amount": 412.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "123354",
+      "name": "KOTMALE SET YOGHURT PROMO 6 PA",
+      "rate": 400.0,
+      "qty": 1,
+      "discount": 100.0,
+      "amount": 300.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310084",
+      "name": "LIME",
+      "rate": 1080.0,
+      "qty": 0.114,
+      "discount": 30.78,
+      "amount": 92.34,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310045",
+      "name": "SALAD LEAVES",
+      "rate": 590.0,
+      "qty": 0.08,
+      "discount": 11.8,
+      "amount": 35.4,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310081",
+      "name": "LADIES FINGERS",
+      "rate": 205.0,
+      "qty": 0.202,
+      "discount": 10.35,
+      "amount": 31.06,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310128",
+      "name": "BIG ONIONS",
+      "rate": 360.0,
+      "qty": 0.58,
+      "discount": 52.2,
+      "amount": 156.6,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310044",
+      "name": "SALAD CUCUMBER",
+      "rate": 410.0,
+      "qty": 0.28,
+      "discount": 28.7,
+      "amount": 86.1,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310133",
+      "name": "POTATOES",
+      "rate": 345.0,
+      "qty": 0.486,
+      "discount": 41.92,
+      "amount": 125.75,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310196",
+      "name": "THREE STAR ORGANIC KANKUN 150G",
+      "rate": 150.0,
+      "qty": 1,
+      "discount": 37.5,
+      "amount": 112.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310125",
+      "name": "TOMATOES",
+      "rate": 655.0,
+      "qty": 0.21,
+      "discount": 34.39,
+      "amount": 103.16,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310129",
+      "name": "GARLIC",
+      "rate": 890.0,
+      "qty": 0.29,
+      "discount": 64.53,
+      "amount": 193.57,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310070",
+      "name": "GREEN CHILIES",
+      "rate": 800.0,
+      "qty": 0.07,
+      "discount": 14.0,
+      "amount": 42.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310113",
+      "name": "CAPSICUM",
+      "rate": 860.0,
+      "qty": 0.136,
+      "discount": 29.24,
+      "amount": 87.72,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "310180",
+      "name": "LAKNA AMERICAN OYESTER MUSHROO",
+      "rate": 210.0,
+      "qty": 1,
+      "discount": 52.5,
+      "amount": 157.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "123537",
+      "name": "SOUL CHOCOLATE MILK DRINK 200G",
+      "rate": 1510.0,
+      "qty": 1,
+      "discount": 235.84,
+      "amount": 1274.16,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "112326",
+      "name": "BABY CHERAMY CARE BABY SOAP EC",
+      "rate": 710.0,
+      "qty": 1,
+      "discount": 177.5,
+      "amount": 532.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "120765",
+      "name": "KIST RIDE CLASSIC FORMULATED C",
+      "rate": 350.0,
+      "qty": 1,
+      "discount": 87.5,
+      "amount": 262.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "113127",
+      "name": "FLORA BARBEQUE STICKS 100S",
+      "rate": 275.0,
+      "qty": 1,
+      "discount": 68.75,
+      "amount": 206.25,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "119973",
+      "name": "SPINNER CAFFEINATED DRINK 250M",
+      "rate": 350.0,
+      "qty": 1,
+      "discount": 87.5,
+      "amount": 262.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "121973",
+      "name": "DELMEGE VANILLA ESSENCE 28ML",
+      "rate": 240.0,
+      "qty": 1,
+      "discount": 60.0,
+      "amount": 180.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "112632",
+      "name": "FLORA PAPER SERVIETTES 50S",
+      "rate": 200.0,
+      "qty": 1,
+      "discount": 50.0,
+      "amount": 150.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "122789",
+      "name": "FEMS SANITARY NAPKINS DRYTEX W",
+      "rate": 270.0,
+      "qty": 1,
+      "discount": 67.5,
+      "amount": 202.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "117619",
+      "name": "KOTMALE CHEESE 200G",
+      "rate": 950.0,
+      "qty": 1,
+      "discount": 237.5,
+      "amount": 712.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "124013",
+      "name": "EDINBOROUGH EGG MAYONNIASE 360",
+      "rate": 1270.0,
+      "qty": 1,
+      "discount": 317.5,
+      "amount": 952.5,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "122692",
+      "name": "SMAK HOT & SPICY MIXTURE 80G",
+      "rate": 280.0,
+      "qty": 1,
+      "discount": 70.0,
+      "amount": 210.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "115293",
+      "name": "PRIMA NOODLES KOTTU MEE HOT &",
+      "rate": 140.0,
+      "qty": 2,
+      "discount": 70.0,
+      "amount": 210.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    },
+    {
+      "code": "116447",
+      "name": "EDINBOROUGH SOY SAUCE 385G",
+      "rate": 320.0,
+      "qty": 1,
+      "discount": 80.0,
+      "amount": 240.0,
+      "scheme": "Bank Promotion - Sampath Bank CC 25% (capped at Rs 2,500)"
+    }
+  ]
+}
