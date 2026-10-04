@@ -2,6 +2,36 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [0.3.0] — 2026-10-04
+
+The workbook loop: **add bills → export an Excel workbook → next time import it plus new bills → export again.**
+
+### Added
+
+- **Workbook page** (the new front door): import your last workbook, add new bills, export — with where things
+  stand (bills in the ledger, bills not yet in a workbook you hold, last export).
+- **Export to `.xlsx`** (US-22): Summary, Bills, Line Items, Monthly Trend, Sources & Method, plus the data sheets the
+  importer reads. Totals are formulas that already carry their calculated values; Keells totals are marked a floor.
+- **Import a workbook** (US-23): every bill schema-validated and re-reconciled; bills already present are skipped and
+  never overwritten; a changed copy in the file is reported by reference; rejected bills are named with the failing
+  check; several files at once; JSON backups still work. Reports contents-unchanged / edited-outside-the-app.
+- **Lossless, repeatable round trip** (US-24): tested through three full export → import → export cycles.
+- Safe by construction (NFR-13): `.xlsx` only (macro and legacy formats refused), 20 MB and row caps, formulas never
+  evaluated, only the `About` and `Data_` sheets are read, so reformatting or extending the workbook in Excel is safe.
+- ADR-0006, stories US-22–US-25, NFR-13/14, threat-model rows, and 52 more tests (184 unit, 80+ browser).
+
+### Changed
+
+- The app opens on the Workbook page; the ledger moved to its own route (`#/ledger`).
+- JSON backup is now an advanced option under Settings; the workbook is the primary backup.
+- `uuid` pinned to a patched CommonJS-compatible release (0 known vulnerabilities).
+
+### Fixed
+
+- A cached result of exactly 0 was dropped from exported formulas, which would show blank in viewers that do not
+  recalculate; zeros are now written as plain numbers (and `fullCalcOnLoad` is set). A test checks every formula.
+- Phone layout: a status sentence could not wrap and stretched the page; the tab bar was sized for five tabs.
+
 ## [0.2.0] — 2026-10-04
 
 Phase 1 hardened to production standards. No analysis views yet (Phases 2–4 unchanged).

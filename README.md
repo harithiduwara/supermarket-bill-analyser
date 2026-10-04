@@ -4,8 +4,20 @@ Turns Sri Lankan supermarket bills into a **reconciled ledger**. Every bill must
 is saved; every figure shown is exactly what is printed on a bill. A static site that runs entirely in the
 browser, hosted on GitHub Pages.
 
-**Status:** Phase 1 of 4 (ingest and reconcile) — hardened. Analysis views, the rules engine and the XLSX export
-are Phases 2–4 ([roadmap](docs/requirements.md)).
+**Status:** Phase 1 (ingest and reconcile) hardened, plus the workbook export/import loop. The rules engine
+(categories, schemes), the analysis views and their workbook sheets are next ([roadmap](docs/requirements.md)).
+
+## The loop
+
+```
+add bills ─▶ export workbook (.xlsx) ─▶ keep the file
+     ▲                                      │
+     └──── import it next time + new bills ◀┘
+```
+
+The Excel workbook is your ledger on disk. Import last time's workbook (bills already here are skipped, nothing is
+ever overwritten), add the new bills, export again. Importing re-checks every bill, so a file edited by hand cannot
+slip a bill that does not add up into the ledger.
 
 ## What it does
 
@@ -16,7 +28,7 @@ are Phases 2–4 ([roadmap](docs/requirements.md)).
   points = 0.34% of net (Keells) · every line (receipts). Tolerance Rs 0.02, never widened.
 - **Idempotent** — bills are keyed on their reference; re-submitting is a no-op.
 - **Ledger** — search, filter, sort, stable link per bill, original text/photo kept, audit trail.
-- **Backup** — export/import (validated, re-reconciled), reminder, persistent-storage request.
+- **Workbook** — export to Excel and import it back, losslessly and repeatably; JSON backup as an advanced option; reminder; persistent-storage request.
 
 ## Architecture
 
@@ -26,10 +38,12 @@ flowchart LR
   B[Receipt photo] --> O[ocr.ts: untrusted draft] --> D[draft.ts: human confirmation]
   P --> R{reconcile.ts<br/>gate}
   D --> R
-  F[Backup file] --> V[validate.ts] --> R
+  F[Workbook or JSON backup] --> V[validate.ts] --> R
   R -- pass --> L[(Ledger: IndexedDB<br/>facts only)]
   R -- fail --> X[Blocked, with arithmetic]
   L --> Q[ledgerView.ts<br/>derived on read]
+  L --> W[xlsx export<br/>readable + Data_ sheets]
+  W -. next session .-> F2[Workbook import] --> V
   L --> U[Audit log]
 ```
 
@@ -66,6 +80,8 @@ photo is sent, only when you press Read. The model is configurable; default `cla
 ## Known limits (stated, not hidden)
 
 - **Local only.** One browser, one user. No sync, no accounts (ADR-0001). Export regularly.
+- **Editing an existing bill in Excel has no effect** — import never overwrites; a differing copy is reported (correcting a bill is US-16, not built).
+- **The analysis sheets** (categories, scheme models, capture gap…) are not in the workbook yet; they will be added as extra sheets and old workbooks will keep importing.
 - **E-bill content is pasted**, not fetched (ADR-0002). Converting pasted HTML is **unverified** against the live
   digibill page; pasting the visible text always works.
 - **Keells totals are a floor** — trips missing from the ledger are not counted. The Capture Gap view arrives in Phase 3.

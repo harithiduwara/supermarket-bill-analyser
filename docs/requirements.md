@@ -24,7 +24,7 @@ what was spent, where, and what discount was left unclaimed. This product turns 
 
 ## 3. Scope
 
-**In scope:** Keells e-bill ingest; paper-receipt ingest by photo (OCR) with mandatory human confirmation;
+**In scope:** the workbook loop (export / import Excel); Keells e-bill ingest; paper-receipt ingest by photo (OCR) with mandatory human confirmation;
 reconciliation; idempotent ledger; derived analysis (9 views); backup/restore; XLSX export; accessibility.
 
 **Out of scope (and why it matters for the architecture):**
@@ -97,6 +97,48 @@ As P1, I photograph a receipt and confirm what was read before anything is saved
 - Given the ledger has changes not yet exported for 14 days, then I am reminded (non-blocking).
 - Given the browser supports it, then persistent storage is requested so the ledger is not evicted.
 
+### The workbook loop (the core workflow)
+
+The Excel workbook is the ledger's portable carrier between sessions (ADR-0006): **add bills → export a workbook →
+next time, import that workbook plus new bills → export again → repeat.**
+
+**US-22 Export a workbook** — Must · P1 · 🔨
+As P1, I download one Excel file containing everything, so that I can keep it, open it in Excel and use it next time.
+
+- Given a ledger, when I export, then I get an `.xlsx` with readable sheets (Summary, Bills, Line Items, Monthly
+  Trend, Sources & Method) and data sheets the importer reads (`Data_*`, `About`).
+- Given the totals rows, then they are Excel formulas that already carry their calculated values (no blank cells
+  before Excel recalculates).
+- Given the Keells totals, then the workbook carries the capture-gap caveat, as the app does.
+- Given I never typed a figure, then every figure in the workbook is exactly as printed on a bill.
+
+**US-23 Import a workbook and keep going** — Must · P1 · 🔨
+As P1, I import my previously exported workbook, then add new bills, so that I never start from nothing.
+
+- Given a workbook exported by this app, when I import it, then every bill is schema-validated and re-reconciled;
+  bills already in the ledger are skipped; new ones are added; bills failing a check are rejected **by name with
+  the failing check**.
+- Given several workbooks (or JSON backups) at once, then they are merged in order, idempotently.
+- Given a bill in the file whose content differs from the copy already in the ledger, then the ledger copy is kept
+  and the difference is **reported by reference** (the ledger is the source of truth; nothing is silently overwritten).
+- Given a file not exported by this app, a newer format, a macro-enabled or legacy format, an oversized file, or a
+  corrupt file, then it is rejected with a plain reason and the ledger is unchanged.
+- Given the data sheets no longer match the checksum written at export, then I am told the file was edited outside
+  the app (the bills are still individually re-reconciled).
+- Given formulas in data cells, then they are never evaluated; the cell is treated as invalid.
+
+**US-24 Lossless, repeatable round trip** — Must · P1 · 🔨
+
+- Given any ledger, when I export, import into an empty ledger, and export again — any number of times — then the
+  bills are identical (including printed totals, tenders, promotions, line numbers, null vs zero, original e-bill text).
+- Given I import the same workbook twice, then nothing changes the second time.
+
+**US-25 Guided workbook page** — Should · P1 · 🔨
+
+- Given the app opens, then the first screen shows the three steps (import → add bills → export) with the current
+  state: bills in the ledger, bills added since the last export, last export time.
+- Given bills were added since the last export, then I am told plainly that the workbook on disk is out of date.
+
 **US-17 Audit trail** — Should · P2 · 🔨
 
 - Given any ingest, import, export or seed, then an append-only event is recorded with time, type, reference,
@@ -143,17 +185,21 @@ status not conveyed by colour alone, announced results, no contrast failures, re
 | NFR-10 | Supply chain    | Dependency audit (high+) and CodeQL run on every push; Dependabot weekly                                                            | CI: audit, CodeQL, Dependabot (not a test title)                                          |
 | NFR-11 | Resilience      | Schema upgrades of the local DB preserve existing bills                                                                             | `migration.test`                                                                          |
 | NFR-12 | Honesty         | Every Keells total carries the capture-gap caveat; every inferred rule states its evidence and observation count                    | e2e `ledger.spec` (caveat on every Keells total); review checklist for rules from Phase 2 |
+| NFR-13 | Security        | Workbook import is bounded and inert: size and row caps, `.xlsx` only, formulas never evaluated, unknown sheets ignored             | `xlsx.test`, `workbook.test`                                                              |
+| NFR-14 | Integrity       | Export → import → export is lossless and repeatable                                                                                 | `xlsx.test`, `workbook.test`, e2e `workbook.spec`                                         |
 
 ## 7. Risks
 
-| ID  | Risk                                                                     | L   | I   | Mitigation                                                                                  |
-| --- | ------------------------------------------------------------------------ | --- | --- | ------------------------------------------------------------------------------------------- |
-| R-1 | A misread OCR digit poisons every downstream figure                      | H   | H   | Mandatory confirmation, live line checks, save gated on checks, photo kept beside the table |
-| R-2 | Browser storage cleared → ledger lost                                    | M   | H   | Persistent-storage request, backup reminder, export/import                                  |
-| R-3 | Pasted digibill HTML differs from the saved text the parser was built on | M   | M   | Plain-text paste path; parse error is explicit; unverified status documented                |
-| R-4 | Rules inferred from a few bills break on new data                        | H   | M   | Evidence + observation counts shown; seed bills are regression tests                        |
-| R-5 | API key exposure on a shared machine                                     | M   | H   | Session-only by default, spend-limit advice, one-click clear                                |
-| R-6 | Keells totals read as fact despite missing trips                         | H   | H   | Caveat attached to every Keells total                                                       |
+| ID  | Risk                                                                     | L   | I   | Mitigation                                                                                                                                                                        |
+| --- | ------------------------------------------------------------------------ | --- | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R-1 | A misread OCR digit poisons every downstream figure                      | H   | H   | Mandatory confirmation, live line checks, save gated on checks, photo kept beside the table                                                                                       |
+| R-2 | Browser storage cleared → ledger lost                                    | M   | H   | Persistent-storage request, backup reminder, export/import                                                                                                                        |
+| R-3 | Pasted digibill HTML differs from the saved text the parser was built on | M   | M   | Plain-text paste path; parse error is explicit; unverified status documented                                                                                                      |
+| R-4 | Rules inferred from a few bills break on new data                        | H   | M   | Evidence + observation counts shown; seed bills are regression tests                                                                                                              |
+| R-5 | API key exposure on a shared machine                                     | M   | H   | Session-only by default, spend-limit advice, one-click clear                                                                                                                      |
+| R-7 | A user edits a bill in Excel and expects the app to pick it up           | M   | M   | Ledger is the source of truth: edited existing bills are kept as-is and the difference is reported by reference; checksum flags outside edits; Data sheets labelled "do not edit" |
+| R-8 | A hostile or corrupt `.xlsx` (zip bomb, formulas, huge sheets)           | L   | M   | Size cap, row caps, `.xlsx` only, formulas never evaluated, lazy-loaded reader, per-bill validation + reconcile                                                                   |
+| R-6 | Keells totals read as fact despite missing trips                         | H   | H   | Caveat attached to every Keells total                                                                                                                                             |
 
 ## 8. Definition of Done
 
