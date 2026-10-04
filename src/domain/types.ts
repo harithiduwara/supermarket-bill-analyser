@@ -53,6 +53,8 @@ export interface Bill {
   tenders: Tender[];
   promotions: Promotion[];
   items: BillItem[];
+  /** synthetic bill from the built-in demo set — never exported, removable in one action */
+  demo?: boolean;
   /** fetched e-bill text, kept because the digibill link expires (~3 months) */
   rawText?: string;
   transcribedFrom?: string;
@@ -83,7 +85,7 @@ export interface IngestResult {
   checks: CheckResult[];
 }
 
-export type AuditType = "added" | "duplicate" | "rejected" | "import" | "export" | "seed";
+export type AuditType = "added" | "duplicate" | "rejected" | "import" | "export" | "seed" | "removed";
 export type InputPath = "ebill" | "receipt" | "import" | "seed";
 
 /** Append-only record of what happened to the ledger (US-17). Informational: the

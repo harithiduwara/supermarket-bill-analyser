@@ -25,7 +25,10 @@ const saveRefs = (store: LedgerStore, refs: Set<string>) =>
 /** Bills in the ledger that are in no workbook the user holds — how out of date their file is. */
 export async function billsNotInAnyWorkbook(store: LedgerStore): Promise<string[]> {
   const have = await savedRefs(store);
-  return (await store.all()).map((b) => b.ref).filter((r) => !have.has(r));
+  return (await store.all())
+    .filter((b) => !b.demo)
+    .map((b) => b.ref)
+    .filter((r) => !have.has(r));
 }
 
 export const workbookFilename = (at: Date): string => `grocery-ledger-${at.toISOString().slice(0, 10)}.xlsx`;
@@ -41,7 +44,8 @@ export async function exportWorkbook(
   opts: { appVersion: string; now?: Date },
 ): Promise<ExportResult> {
   const now = opts.now ?? new Date();
-  const bills = await store.all();
+  // demo bills are fake: they never leave the app in a workbook
+  const bills = (await store.all()).filter((b) => !b.demo);
   const data = await (await xlsx()).buildWorkbook(bills, { exportedAt: now, appVersion: opts.appVersion });
   await saveRefs(store, new Set(bills.map((b) => b.ref)));
   await store.log({ type: "export", detail: `workbook, ${bills.length} bills` }, now);
@@ -89,7 +93,7 @@ export async function importWorkbook(
   const inFile = new Set(bills.map((b) => (b as { ref: string }).ref));
   // bills the file contained are now safe in a workbook the user holds
   await saveRefs(store, new Set([...(await savedRefs(store)), ...inFile]));
-  const notInFile = (await store.all()).filter((b) => !inFile.has(b.ref)).length;
+  const notInFile = (await store.all()).filter((b) => !b.demo && !inFile.has(b.ref)).length;
 
   const result: WorkbookImportSummary = { ...summary, meta, billsInFile: bills.length, checksum, notInFile };
   await store.log({

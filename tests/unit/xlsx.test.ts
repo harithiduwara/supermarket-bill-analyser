@@ -1,13 +1,13 @@
 import ExcelJS from "exceljs";
 import JSZip from "jszip";
 import { describe, expect, it } from "vitest";
-import { seedLedger } from "../../src/domain/ingest";
 import { MemoryStore } from "../../src/domain/store";
 import type { Bill } from "../../src/domain/types";
+import { monthlyTrend } from "../../src/domain/summary";
 import { canonical, ledgerChecksum } from "../../src/domain/workbook";
 import { buildWorkbook, MAX_WORKBOOK_BYTES, readWorkbook, WorkbookError } from "../../src/export/xlsx";
 import { billsNotInAnyWorkbook, exportWorkbook, importWorkbook } from "../../src/export/workbookIO";
-import { allSeed } from "./helpers";
+import { allSeed, seedLedger } from "./helpers";
 
 const seed = allSeed();
 const NOW = new Date("2026-10-04T10:00:00Z");
@@ -67,7 +67,8 @@ describe("US-22 export a workbook", () => {
     expect(sumNet.result).toBeCloseTo(net, 2);
     const months = wb.getWorksheet("Monthly Trend")!;
     let monthNet = 0;
-    for (let r = 4; r <= 7; r++) monthNet += (months.getCell(r, 5).value as { result: number }).result;
+    for (let r = 4; r < 4 + monthlyTrend(seed).length; r++)
+      monthNet += (months.getCell(r, 5).value as { result: number }).result;
     expect(monthNet).toBeCloseTo(net, 2);
   });
 
@@ -93,7 +94,7 @@ describe("US-22 export a workbook", () => {
         }),
       );
     }
-    expect(formulas).toBeGreaterThan(50);
+    expect(formulas).toBeGreaterThan(40);
     expect(bad).toEqual([]);
     // a bill with no discount shows 0%, as a plain number
     const bills = wb.getWorksheet("Bills")!;
@@ -112,7 +113,7 @@ describe("US-22 export a workbook", () => {
   });
 
   it("re-runs reconciliation at export and flags a bill that no longer ties", async () => {
-    const bad = bill("FYQQRQ");
+    const bad = bill("DEM003");
     bad.net += 50;
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(await buildWorkbook([bad], { exportedAt: NOW, appVersion: "1" }));
@@ -126,7 +127,7 @@ describe("US-22 export a workbook", () => {
   });
 
   it("every figure in the workbook is a printed figure: text that looks like a formula stays text", async () => {
-    const b = bill("FYQQRQ");
+    const b = bill("DEM003");
     b.items[0].name = '=HYPERLINK("http://evil.example","x")';
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(await buildWorkbook([b], { exportedAt: NOW, appVersion: "1" }));
@@ -212,7 +213,7 @@ describe("US-23 import a workbook and keep going", () => {
 
     const fresh = new MemoryStore(); // a new browser / a new day
     await importWorkbook(fresh, week1);
-    const newBill = { ...bill("FYQQRQ"), ref: "NEW001" };
+    const newBill = { ...bill("DEM003"), ref: "NEW001" };
     await fresh.add(newBill);
     expect(await billsNotInAnyWorkbook(fresh)).toEqual(["NEW001"]);
     const week2 = (await exportWorkbook(fresh, { appVersion: "1", now: new Date("2026-10-11T00:00:00Z") }))
@@ -231,12 +232,12 @@ describe("US-23 import a workbook and keep going", () => {
     const edited = await tamper(data, (wb) => {
       const ws = wb.getWorksheet("Data_Bills")!;
       let row = 0;
-      ws.eachRow((r, n) => n > 1 && r.getCell(1).value === "FYQQRQ" && (row = n));
+      ws.eachRow((r, n) => n > 1 && r.getCell(1).value === "DEM003" && (row = n));
       cellOf(ws, "store", row).value = "Somewhere else";
     });
     const before = await canon(s);
     const r = await importWorkbook(s, edited);
-    expect(r.conflicts).toEqual(["FYQQRQ"]);
+    expect(r.conflicts).toEqual(["DEM003"]);
     expect(r.checksum).toBe("mismatch"); // edited outside the app
     expect(await canon(s)).toEqual(before); // ledger copy kept
   });

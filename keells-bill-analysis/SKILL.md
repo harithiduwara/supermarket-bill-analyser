@@ -51,7 +51,7 @@ Long receipts often span two photos with an overlap. Reconcile the overlap
 before transcribing — line numbers are the reliable key, not position.
 
 Give the bill a reference the store would recognise: ticket number prefixed by
-store, e.g. `GLO546052`. Set `source` so the right department-code map applies;
+store, e.g. `GLO900001`. Set `source` so the right department-code map applies;
 `fresh_eligible` is forced false for non-Keells sources, since the 25%-off-Fresh
 promotion is a Keells scheme.
 
@@ -109,7 +109,7 @@ the numbers. Cover:
    credit, not a missing bill. Loyalty points on other schemes have their own
    balances and expiry dates — flag an expiry that is close.
 4. **Discount capture** — captured versus the fresh-promotion ceiling. See
-   `reference/promo-rules.md`. Always call this a ceiling, not a saving.
+   `../docs/rules-evidence.md`. Always call this a ceiling, not a saving.
 5. **Price movement** — only items that moved more than 5%.
 6. **Anything odd** — duplicate trips the same day, unusual line items, a new store.
 

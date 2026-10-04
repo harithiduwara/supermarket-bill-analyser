@@ -12,7 +12,7 @@ describe("US-03 IndexedDB store", () => {
     await ingestMany(s, seed);
     expect((await s.all()).length).toBe(24);
     await expect(s.add(seed[0])).rejects.toThrow(/already in ledger/);
-    const back = await s.get("FYQQRQ");
-    expect(back?.net).toBe(seed.find((b) => b.ref === "FYQQRQ")!.net);
+    const back = await s.get("DEM003");
+    expect(back?.net).toBe(seed.find((b) => b.ref === "DEM003")!.net);
   });
 });

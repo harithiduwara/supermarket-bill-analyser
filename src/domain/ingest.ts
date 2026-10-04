@@ -47,17 +47,9 @@ export async function ingestMany(
   return out;
 }
 
-/** Load the bundled seed bills: one summary event, not 24. */
-export async function seedLedger(store: LedgerStore, bills: Bill[]): Promise<IngestResult[]> {
-  const results = await ingestMany(store, bills, { via: "seed", silent: true });
-  const added = results.filter((r) => r.status === "added").length;
-  await store.log({ type: "seed", via: "seed", detail: `${added} of ${bills.length} seed bills loaded` });
-  return results;
-}
-
 const EBILL_REF = /^[A-Z0-9]{6}$/;
 
-/** `https://digibill.keellssuper.com/FYQQRQ` (or just `FYQQRQ`) -> `FYQQRQ`. */
+/** `https://digibill.keellssuper.com/AB12CD` (or just `AB12CD`) -> `AB12CD`. */
 export function refFromEbillUrl(input: string): string | null {
   const t = input
     .trim()
@@ -80,7 +72,10 @@ export interface LedgerFile {
 }
 
 export async function exportLedger(store: LedgerStore, now: Date = new Date()): Promise<LedgerFile> {
-  const bills = (await store.all()).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  // demo bills are fake: they never leave the app in a backup
+  const bills = (await store.all())
+    .filter((b) => !b.demo)
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   await store.log({ type: "export", detail: `${bills.length} bills`, via: undefined }, now);
   return { version: 1, exportedAt: now.toISOString(), bills };
 }

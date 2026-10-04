@@ -45,14 +45,14 @@ test.describe("US-06 backup and restore", () => {
     await expect(page.getByText("0 added", { exact: true })).toBeVisible();
     await page.getByRole("link", { name: "Activity" }).click();
     await expect(page.getByRole("row").nth(1)).toContainText("Import");
-    await expect(page.getByText("24 of 24 seed bills loaded")).toBeVisible();
+    await expect(page.getByText(/workbook exported 2026-10-04: 24 added, 0 already present/)).toBeVisible();
   });
 
   test("US-17 a saved e-bill is recorded in Activity", async ({ page }) => {
     // rejected/duplicate events cannot be produced through the UI (Save is disabled / no-ops); they are covered by tests/unit/audit.test.ts
     await openApp(page, "#/add/ebill");
     await page.getByLabel(/Link or 6-character code/).fill("TEST02");
-    await page.getByLabel(/Paste the page text/).fill(rawBill("YYLH0T"));
+    await page.getByLabel(/Paste the page text/).fill(rawBill("DEM005"));
     await page.getByRole("button", { name: "Save to ledger" }).click();
     await page.getByRole("link", { name: "Activity" }).click();
     await expect(page.getByText("✓ Added")).toBeVisible();

@@ -7,7 +7,7 @@ import { openApp, rawBill, workbookFile } from "./helpers";
 const fileInput = (page: Page) => page.locator('.dropzone input[type="file"]');
 const exportBtn = (page: Page) => page.getByRole("button", { name: "Download workbook (.xlsx)" });
 
-async function addEbill(page: Page, ref: string, from = "FYQQRQ") {
+async function addEbill(page: Page, ref: string, from = "DEM003") {
   await openApp(page, "#/add/ebill");
   await page.getByLabel(/Link or 6-character code/).fill(`https://digibill.keellssuper.com/${ref}`);
   await page.getByLabel(/Paste the page text/).fill(rawBill(from));
@@ -41,7 +41,18 @@ test.describe("US-25 the workbook page is the front door", () => {
       await expect(page.getByRole("heading", { name: h })).toBeVisible();
     }
     await expect(page.getByText("Bills in the ledger")).toBeVisible();
-    await expect(page.getByText(/24 bills are not in any workbook you hold — export again/)).toBeVisible();
+    await expect(page.getByText("✓ Your workbook is up to date")).toBeVisible(); // the 24 came from a workbook you hold
+  });
+
+  test("a brand-new visitor sees an empty ledger, a first-run card, and nothing to export yet", async ({
+    page,
+  }) => {
+    await openApp(page, "#/", "empty");
+    await expect(page.getByRole("heading", { name: "Nothing here yet" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Load demo data" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Download workbook (.xlsx)" })).toBeDisabled();
+    await openApp(page, "#/ledger", "empty");
+    await expect(page.getByRole("heading", { name: "No bills yet" })).toBeVisible();
   });
 });
 
@@ -76,7 +87,7 @@ test.describe("US-22 export a workbook", () => {
 
   test("adding a bill afterwards says the workbook is out of date again", async ({ page }) => {
     await openApp(page, "#/");
-    await download(page);
+    await expect(page.getByText("✓ Your workbook is up to date")).toBeVisible();
     await addEbill(page, "NEWBIL");
     await openApp(page, "#/");
     await expect(page.getByText(/1 bill is not in any workbook you hold — export again/)).toBeVisible();
@@ -94,7 +105,7 @@ test.describe("US-23 / US-24 the loop across sessions", () => {
     await openApp(page, "#/");
     const day1 = await download(page);
 
-    // day 2, a brand-new browser profile: it only has the starting data
+    // day 2, a brand-new browser profile: it starts with the same 24 imported bills and nothing else
     const ctx = await browser.newContext({ baseURL });
     const p2 = await ctx.newPage();
     await openApp(p2, "#/");
@@ -104,7 +115,7 @@ test.describe("US-23 / US-24 the loop across sessions", () => {
     await expect(report).toContainText("contents unchanged since export");
     await expect(report).toContainText("25 bills in the file");
 
-    await addEbill(p2, "LOOP02", "YYLH0T");
+    await addEbill(p2, "LOOP02", "DEM005");
     await openApp(p2, "#/");
     await expect(p2.getByText(/1 bill is not in any workbook you hold/)).toBeVisible();
     const day2 = await download(p2);

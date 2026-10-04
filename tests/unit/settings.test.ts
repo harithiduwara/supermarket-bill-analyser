@@ -72,7 +72,7 @@ describe("US-06 backup reminder", () => {
   const now = new Date("2026-10-20T00:00:00Z");
   const ev = (type: string, at: string) => ({ type, at });
 
-  it("is not due when nothing has changed — the starting data never nags", () => {
+  it("is not due when nothing has changed — demo data never nags", () => {
     expect(backupDue(oldestUnexportedChange([ev("seed", "2026-01-01T00:00:00Z")], null), now)).toBe(false);
     expect(backupDue(null, now)).toBe(false);
   });

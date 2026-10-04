@@ -41,22 +41,22 @@ describe("US-03 idempotent ingest, US-04 gate", () => {
 
   it("a bill failing a check is rejected and not saved", async () => {
     const s = new MemoryStore();
-    const bad = structuredClone(seed.find((b) => b.ref === "FYQQRQ")!);
+    const bad = structuredClone(seed.find((b) => b.ref === "DEM003")!);
     bad.items[0].amount += 10;
     const r = await ingest(s, bad);
     expect(r.status).toBe("rejected");
     expect(r.checks.find((c) => c.id === "itemsEqualGross")!.ok).toBe(false);
-    expect(await s.has("FYQQRQ")).toBe(false);
+    expect(await s.has("DEM003")).toBe(false);
   });
 
   it("extracts the ref from a digibill link", () => {
-    expect(refFromEbillUrl("https://digibill.keellssuper.com/FYQQRQ")).toBe("FYQQRQ");
-    expect(refFromEbillUrl("digibill.keellssuper.com/fyqqrq/")).toBe("FYQQRQ");
+    expect(refFromEbillUrl("https://digibill.keellssuper.com/AB12CD")).toBe("AB12CD");
+    expect(refFromEbillUrl("digibill.keellssuper.com/ab12cd/")).toBe("AB12CD");
     expect(refFromEbillUrl("https://digibill.keellssuper.com/")).toBeNull();
     expect(refFromEbillUrl("nonsense")).toBeNull();
   });
   it("builds a store-prefixed receipt ref", () => {
-    expect(receiptRef("glo", "546052")).toBe("GLO546052");
+    expect(receiptRef("glo", "900001")).toBe("GLO900001");
   });
 });
 
@@ -66,10 +66,10 @@ describe("US-03 in-memory store (the test double must behave like the real one)"
     const photo = new Blob(["x"], { type: "image/png" });
     await ingest(
       s,
-      seed.find((b) => b.ref === "GLO549921")!,
+      seed.find((b) => b.ref === "GLO900003")!,
       { images: [photo] },
     );
-    expect(await s.images("GLO549921")).toHaveLength(1);
+    expect(await s.images("GLO900003")).toHaveLength(1);
     expect(await s.images("NOPE")).toEqual([]);
     await expect(s.add(seed[0])).resolves.toBeUndefined();
     await expect(s.add(seed[0])).rejects.toThrow(/already in ledger/);

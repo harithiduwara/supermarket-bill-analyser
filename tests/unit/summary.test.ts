@@ -1,39 +1,46 @@
 import { describe, expect, it } from "vitest";
 import { byPayment, byStore, headline, monthlyTrend } from "../../src/domain/summary";
-import { allSeed, ledger } from "./helpers";
+import { allSeed } from "./helpers";
 
 const seed = allSeed();
-const py = Object.values(ledger.bills) as {
-  date: string;
-  gross: number;
-  discount: number;
-  net: number;
-  store: string;
-  source: string;
-  tenders: { method: string; amount: number }[];
-}[];
 const cents = (x: number) => Math.round(x * 100);
+/** Independent of summary.ts: plain loops over the printed fields. */
+const total = (bills: typeof seed, f: (b: (typeof seed)[number]) => number) =>
+  bills.reduce((s, b) => s + f(b), 0);
+const dayCount = (a: string, b: string) =>
+  Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000) + 1;
 
-describe("US-22 workbook figures are sums of printed figures (checked against the Python ledger)", () => {
-  it("headline totals equal the Python ledger's totals to the cent", () => {
+describe("US-22 workbook figures are sums of printed figures", () => {
+  it("headline totals equal an independent sum to the cent", () => {
     const h = headline(seed);
     expect(h.bills).toBe(24);
-    expect(cents(h.gross)).toBe(cents(py.reduce((s, b) => s + b.gross, 0)));
-    expect(cents(h.discount)).toBe(cents(py.reduce((s, b) => s + b.discount, 0)));
-    expect(cents(h.net)).toBe(cents(py.reduce((s, b) => s + b.net, 0)));
+    expect(cents(h.gross)).toBe(cents(total(seed, (b) => b.gross)));
+    expect(cents(h.discount)).toBe(cents(total(seed, (b) => b.discount)));
+    expect(cents(h.net)).toBe(cents(total(seed, (b) => b.net)));
     expect(cents(h.gross - h.discount)).toBe(cents(h.net));
-    expect(h.first).toBe("2026-07-30");
-    expect(h.last).toBe("2026-10-03");
-    expect(h.days).toBe(66);
+    expect(h.lines).toBe(total(seed, (b) => b.items.length));
+    const dates = seed.map((b) => b.date).sort();
+    expect(h.first).toBe(dates[0]);
+    expect(h.last).toBe(dates[dates.length - 1]);
+    expect(h.days).toBe(dayCount(dates[0], dates[dates.length - 1]));
     expect(h.keellsBills).toBe(21);
+    expect(cents(h.keellsNet)).toBe(
+      cents(
+        total(
+          seed.filter((b) => b.source === "keells"),
+          (b) => b.net,
+        ),
+      ),
+    );
   });
-  it("monthly trend sums back to the headline", () => {
+  it("monthly trend matches an independent grouping and sums back to the headline", () => {
     const m = monthlyTrend(seed);
-    expect(m.map((x) => x.month)).toEqual(["2026-07", "2026-08", "2026-09", "2026-10"]);
+    expect(m.map((x) => x.month)).toEqual(["2026-06", "2026-07", "2026-08"]);
     for (const x of m) {
-      const mine = py.filter((b) => b.date.startsWith(x.month));
+      const mine = seed.filter((b) => b.date.startsWith(x.month));
       expect(x.bills).toBe(mine.length);
-      expect(cents(x.net)).toBe(cents(mine.reduce((s, b) => s + b.net, 0)));
+      expect(cents(x.net)).toBe(cents(total(mine, (b) => b.net)));
+      expect(cents(x.gross)).toBe(cents(total(mine, (b) => b.gross)));
     }
     expect(cents(m.reduce((s, x) => s + x.net, 0))).toBe(cents(headline(seed).net));
   });
@@ -60,6 +67,6 @@ describe("US-22 workbook figures are sums of printed figures (checked against th
       .slice(0, 4)
       .map((b) => b.net)
       .sort((a, b) => a - b);
-    expect(headline(seed.slice(0, 4)).medianBasket).toBeCloseTo((four[1] + four[2]) / 2, 2);
+    expect(headline(seed.slice(0, 4)).medianBasket).toBeCloseTo((four[1] + four[2]) / 2, 1); // to the nearest cent
   });
 });

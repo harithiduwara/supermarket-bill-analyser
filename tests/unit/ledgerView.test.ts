@@ -18,11 +18,11 @@ describe("US-05 ledger view", () => {
     expect(queryLedger(seed, q({ source: "glomark" })).matching).toBe(3);
     expect(queryLedger(seed, q({ source: "keells" })).matching).toBe(21);
     expect(
-      queryLedger(seed, q({ month: "2026-09" })).rows.every((r) => r.bill.date.startsWith("2026-09")),
+      queryLedger(seed, q({ month: "2026-07" })).rows.every((r) => r.bill.date.startsWith("2026-07")),
     ).toBe(true);
-    expect(queryLedger(seed, q({ text: "fyqqrq" })).matching).toBe(1);
-    expect(queryLedger(seed, q({ text: "kottawa" })).matching).toBeGreaterThan(1);
-    expect(queryLedger(seed, q({ text: "croissant" })).matching).toBeGreaterThan(0);
+    expect(queryLedger(seed, q({ text: "dem003" })).matching).toBe(1);
+    expect(queryLedger(seed, q({ text: seed[0].store.toLowerCase() })).matching).toBeGreaterThan(1);
+    expect(queryLedger(seed, q({ text: "chicken" })).matching).toBeGreaterThan(0);
     expect(queryLedger(seed, q({ text: "zzzz-no-such" })).matching).toBe(0);
   });
   it("sorts numerically and descending/ascending, with a stable tie-break", () => {

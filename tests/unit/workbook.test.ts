@@ -43,7 +43,7 @@ describe("US-24 / NFR-14 the data layer is lossless", () => {
   });
 
   it("keeps photo-receipt fields: line numbers, line discounts, net amounts, scheme, notes", () => {
-    const g = seed.find((b) => b.ref === "GLO549921")!;
+    const g = seed.find((b) => b.ref === "GLO900003")!;
     const [back] = roundTrip([g]).bills as Bill[];
     expect(back.items.map((i) => [i.line, i.lineDiscount, i.netAmount])).toEqual(
       g.items.map((i) => [i.line, i.lineDiscount, i.netAmount]),
@@ -88,7 +88,7 @@ describe("US-24 / NFR-14 the data layer is lossless", () => {
 });
 
 describe("NFR-13 reading is strict, inert and never guesses", () => {
-  const fyq = seed.find((b) => b.ref === "FYQQRQ")!; // has lines, 2 tenders, 2 promotions and raw text
+  const fyq = seed.find((b) => b.ref === "DEM003")!; // has lines, 2 tenders, 2 promotions and raw text
   const base = () => asRead(billsToTables([clone(fyq)]));
 
   it("detects a truncated sheet instead of silently importing fewer lines", () => {
@@ -96,7 +96,7 @@ describe("NFR-13 reading is strict, inert and never guesses", () => {
     t.items.pop();
     const r = tablesToBills(t);
     expect(r.bills).toEqual([]);
-    expect(r.problems[0]).toMatchObject({ ref: "FYQQRQ" });
+    expect(r.problems[0]).toMatchObject({ ref: "DEM003" });
     expect(r.problems[0].reason).toMatch(/declares \d+ lines but contains \d+/);
   });
   it("detects missing tender / promotion / raw-text rows the same way", () => {

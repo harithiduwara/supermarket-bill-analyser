@@ -27,6 +27,7 @@ jobs:
       - run: npm run format:check
       - run: npm run typecheck
       - run: npm run test:coverage # fails under the coverage thresholds (NFR-09)
+      - run: npm run check:privacy # no real customer identifiers in the repo (ADR-0007)
       - run: npm run check:traceability # every built story / test-verified NFR is named in a test
       - run: npm run build
       - run: npm run check:bundle-size # NFR-08

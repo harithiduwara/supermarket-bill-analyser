@@ -6,7 +6,7 @@ from the sandbox, so Claude fetches the page with web_fetch and saves the text
 first. See SKILL.md.
 
 Usage:
-    python3 parse_bill.py raw/FYQQRQ.md --ref FYQQRQ > parsed/FYQQRQ.json
+    python3 parse_bill.py raw/AB12CD.md --ref AB12CD > parsed/AB12CD.json
     python3 parse_bill.py raw/*.md --outdir parsed
 """
 import argparse

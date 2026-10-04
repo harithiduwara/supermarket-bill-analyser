@@ -2,6 +2,19 @@
 
 All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Security
+
+- **Removed real customer data** that shipped as starting data and test fixtures in the first public deploy
+  (ADR-0007). Git history before this release still contains it until the owner agrees to a history rewrite.
+
+### Changed
+
+- The app now starts empty. **Load demo data** generates fake bills (US-26); they are marked as demo, removable, and
+  never exported. Tests run on generated bills; a private parity test runs only with `REAL_FIXTURES_DIR`.
+- Added `npm run check:privacy` (hashed-identifier guard) to `verify` and CI.
+
 ## [0.3.0] — 2026-10-04
 
 The workbook loop: **add bills → export an Excel workbook → next time import it plus new bills → export again.**

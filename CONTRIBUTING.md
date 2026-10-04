@@ -42,6 +42,12 @@ Conventional style: `feat(US-05): bill detail page`, `fix(reconcile): …`, `doc
 - **Untrusted input is validated:** imported files, OCR output, pasted pages.
 - **No third-party scripts, fonts or CDNs.** The CSP forbids them and a test fails if a request leaves the origin.
 
+## Privacy rule (ADR-0007)
+
+Never commit real bills, receipts, card numbers or store details: not in code, tests, fixtures, docs or screenshots.
+Use `src/domain/demo.ts`. `npm run check:privacy` blocks known identifiers. To check parity against your own bills,
+set `REAL_FIXTURES_DIR` to a local folder outside the repo; that test is skipped everywhere else.
+
 ## UI standards
 
 - WCAG 2.2 AA. Status is **icon + text**, never colour alone. Every control has a visible, programmatic label.

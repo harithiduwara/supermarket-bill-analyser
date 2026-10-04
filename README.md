@@ -85,7 +85,8 @@ photo is sent, only when you press Read. The model is configurable; default `cla
 - **E-bill content is pasted**, not fetched (ADR-0002). Converting pasted HTML is **unverified** against the live
   digibill page; pasting the visible text always works.
 - **Keells totals are a floor** — trips missing from the ledger are not counted. The Capture Gap view arrives in Phase 3.
-- Rules inferred from 24 bills are labelled as inferred wherever they appear.
+- The app starts empty and ships no real data; "Load demo data" adds clearly marked fake bills that are never exported (ADR-0007).
+- Rules inferred from a small set of real bills are labelled as inferred wherever they appear.
 
 ## Documentation
 

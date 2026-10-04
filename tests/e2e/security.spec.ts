@@ -25,7 +25,7 @@ test.describe("NFR-04 content security policy", () => {
     for (const h of [
       "#/",
       "#/ledger",
-      "#/bill/FYQQRQ",
+      "#/bill/DEM003",
       "#/add/ebill",
       "#/add/receipt",
       "#/activity",
@@ -44,7 +44,7 @@ test.describe("NFR-04 content security policy", () => {
       const u = new URL(r.url());
       if (!["localhost", ""].includes(u.hostname) && u.protocol.startsWith("http")) external.push(r.url());
     });
-    for (const h of ["#/", "#/ledger", "#/bill/FYQQRQ", "#/add/receipt", "#/settings"])
+    for (const h of ["#/", "#/ledger", "#/bill/DEM003", "#/add/receipt", "#/settings"])
       await openApp(page, h);
     expect(external).toEqual([]);
   });

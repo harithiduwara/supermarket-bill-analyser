@@ -86,7 +86,7 @@ puts untested rules in the path of real data.
 - `COCONUT` (code 912005) hits the department prefix first and lands in
   Vegetables, which is where Keells shelves it.
 - Coffee and tea fall under Beverages. Split them out if the monthly coffee
-  spend becomes worth tracking on its own — it ran near Rs 2,000 in Aug 2026.
+  spend becomes worth tracking on its own.
 
 
 ---

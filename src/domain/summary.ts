@@ -107,6 +107,6 @@ const shares = (pairs: { key: string; bill: string; amount: number }[]): Share[]
 export const byStore = (bills: Bill[]): Share[] =>
   shares(bills.map((b) => ({ key: b.store || "(unnamed)", bill: b.ref, amount: b.net })));
 
-/** Payment instruments exactly as printed on the bills (e.g. "Seylan-RewadzPay-1001"). */
+/** Payment instruments exactly as printed on the bills (e.g. "Seylan-RewadzPay-0000"). */
 export const byPayment = (bills: Bill[]): Share[] =>
   shares(bills.flatMap((b) => b.tenders.map((t) => ({ key: t.method, bill: b.ref, amount: t.amount }))));

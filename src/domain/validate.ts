@@ -58,6 +58,7 @@ const billSchema = z.object({
     )
     .max(2000),
   items: z.array(itemSchema).min(1).max(2000),
+  demo: z.boolean().optional(),
   rawText: text(200_000).optional(),
   transcribedFrom: text(200).optional(),
   notes: text(2000).optional(),

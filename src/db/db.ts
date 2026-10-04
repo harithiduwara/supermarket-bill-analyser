@@ -45,6 +45,12 @@ export class DexieStore implements LedgerStore {
       for (const blob of images) await this.db.images.add({ ref: bill.ref, blob });
     });
   }
+  async remove(refs: string[]) {
+    await this.db.transaction("rw", this.db.bills, this.db.images, async () => {
+      await this.db.bills.bulkDelete(refs);
+      await this.db.images.where("ref").anyOf(refs).delete();
+    });
+  }
   all() {
     return this.db.bills.orderBy("date").toArray();
   }

@@ -7,8 +7,10 @@ import {
   WorkbookError,
   type WorkbookImportSummary,
 } from "../../export/workbookIO";
+import { loadDemo } from "../../domain/seed";
 import { settings } from "../../settings";
 import { PageHeader } from "../components/PageHeader";
+import { DemoBanner } from "../components/DemoBanner";
 import { StatusBadge } from "../components/StatusBadge";
 import { useApp } from "../context";
 import { fmtDateTime } from "../format";
@@ -95,6 +97,7 @@ export function WorkbookPage({ onChanged }: { onChanged: () => Promise<void> }) 
     }
   }
 
+  const mine = bills.filter((b) => !b.demo).length; // demo bills are never exported
   const upToDate = pending !== null && pending.length === 0;
 
   return (
@@ -103,6 +106,27 @@ export function WorkbookPage({ onChanged }: { onChanged: () => Promise<void> }) 
         title="Workbook"
         lead="Your Excel workbook is your ledger. Import last time's workbook, add new bills, then export it again — and repeat."
       />
+
+      <DemoBanner onRemoved={onChanged} />
+      {bills.length === 0 && (
+        <section className="card" aria-labelledby="fr-h">
+          <h2 id="fr-h">Nothing here yet</h2>
+          <p>
+            Your ledger is empty and lives only in this browser. Import a workbook you exported before (step
+            1), add bills (step 2), or look around first with invented bills:
+          </p>
+          <button
+            className="btn"
+            onClick={async () => {
+              await loadDemo(store);
+              await onChanged();
+              toast("Demo data loaded — these bills are invented.");
+            }}
+          >
+            Load demo data
+          </button>
+        </section>
+      )}
 
       <section className="card" aria-labelledby="st-h">
         <h2 id="st-h">Where things stand</h2>
@@ -137,8 +161,7 @@ export function WorkbookPage({ onChanged }: { onChanged: () => Promise<void> }) 
           <h2 id="w1">Import your last workbook</h2>
           <p className="small muted">
             Start here if you have one. Every bill in it is re-checked, bills already here are skipped, and
-            nothing is ever overwritten. You can choose several files. First time? Skip to step 2 — the
-            starting bills are already loaded.
+            nothing is ever overwritten. You can choose several files. First time? Skip to step 2.
           </p>
           <label
             className={`dropzone${over ? " over" : ""}`}
@@ -196,10 +219,15 @@ export function WorkbookPage({ onChanged }: { onChanged: () => Promise<void> }) 
             One Excel file with Summary, Bills, Line Items and Monthly Trend, plus the data this app reads
             back next time. Keells totals are marked as a floor. Keep the file — it is your ledger.
           </p>
-          <button className="btn primary" disabled={busy !== null || bills.length === 0} onClick={doExport}>
+          <button className="btn primary" disabled={busy !== null || mine === 0} onClick={doExport}>
             {busy === "export" ? "Building…" : "Download workbook (.xlsx)"}
           </button>
-          {!upToDate && pending !== null && bills.length > 0 && (
+          {mine === 0 && (
+            <span className="muted small hint-block">
+              There is nothing of yours to export yet. Demo bills are never included.
+            </span>
+          )}
+          {!upToDate && pending !== null && mine > 0 && (
             <span className="muted small hint-block">
               The file will include the {pending.length} bill{pending.length === 1 ? "" : "s"} not yet in a
               workbook.

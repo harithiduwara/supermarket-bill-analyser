@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DexieStore } from "../db/db";
-import { seedLedger } from "../domain/ingest";
-import { seedBills } from "../domain/seed";
 import type { Bill } from "../domain/types";
 import { requestPersistence } from "../storage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -53,23 +51,17 @@ function Shell() {
 
   const refresh = useCallback(async () => setBills(await store.all()), [store]);
 
+  // The ledger starts EMPTY. Nothing is preloaded: a visitor either imports their own workbook or chooses to load
+  // the (synthetic) demo bills on the Workbook page.
   useEffect(() => {
     void (async () => {
       try {
-        // Seed once. Idempotent anyway (keyed on ref); the flag only avoids re-parsing every load.
-        if ((await store.getMeta("seeded")) !== "1" && (await store.all()).length === 0) {
-          const results = await seedLedger(store, seedBills());
-          const bad = results.filter((r) => r.status === "rejected");
-          if (bad.length)
-            throw new Error(`Starting data failed reconciliation: ${bad.map((b) => b.ref).join(", ")}`);
-          await store.setMeta("seeded", "1");
-        }
         await refresh();
       } catch (e) {
         setFatal((e as Error).message);
       }
     })();
-  }, [store, refresh]);
+  }, [refresh]);
 
   // After any save: reload, and (once) ask the browser to protect the data from eviction.
   const afterSave = useCallback(async () => {

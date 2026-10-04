@@ -33,7 +33,7 @@ describe("US-01 pasted page source is converted without interpreting it as marku
     }
   });
   it("leaves plain text alone", () => {
-    const t = rawText("FYQQRQ");
+    const t = rawText("DEM003");
     expect(htmlToText(t)).toBe(t);
   });
   it("drops scripts, styles, head and comments with their contents", () => {

@@ -3,6 +3,7 @@ import { money } from "../../domain/num";
 import { allPass, reconcile } from "../../domain/reconcile";
 import type { AuditEvent } from "../../domain/types";
 import { CheckList } from "../components/CheckList";
+import { DemoBanner } from "../components/DemoBanner";
 import { FloorCaveat } from "../components/FloorCaveat";
 import { PageHeader } from "../components/PageHeader";
 import { PhotoViewer } from "../components/PhotoViewer";
@@ -63,6 +64,7 @@ export function BillPage({ billRef }: { billRef: string }) {
         actions={<StatusBadge ok={allPass(checks)} />}
       />
 
+      {bill.demo && <DemoBanner />}
       <section className="card" aria-labelledby="sum-h">
         <h2 id="sum-h">Summary (as printed)</h2>
         <dl className="facts">
@@ -221,8 +223,7 @@ export function BillPage({ billRef }: { billRef: string }) {
         <h2 id="ev-h">History</h2>
         {events.length === 0 ? (
           <p className="muted">
-            No individual events recorded (bills loaded from the starting data are summarised on the Activity
-            page).
+            No individual events recorded (bills loaded as demo data are summarised on the Activity page).
           </p>
         ) : (
           <table>

@@ -4,8 +4,8 @@ import { fillSmallReceipt, openApp } from "./helpers";
 const routes = [
   "#/",
   "#/ledger",
-  "#/bill/FYQQRQ",
-  "#/bill/GLO549921",
+  "#/bill/DEM003",
+  "#/bill/GLO900003",
   "#/add/ebill",
   "#/add/receipt",
   "#/activity",

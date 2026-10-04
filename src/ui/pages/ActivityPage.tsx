@@ -11,7 +11,8 @@ const LABEL: Record<AuditType, { text: string; cls: string }> = {
   rejected: { text: "✕ Rejected", cls: "bad" },
   import: { text: "⇩ Import", cls: "neutral" },
   export: { text: "⇧ Export", cls: "neutral" },
-  seed: { text: "● Starting data", cls: "neutral" },
+  seed: { text: "● Demo data", cls: "neutral" },
+  removed: { text: "– Removed", cls: "neutral" },
 };
 
 export function ActivityPage() {

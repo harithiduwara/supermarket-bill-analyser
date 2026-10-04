@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { exportLedger, importLedger, ingest, seedLedger } from "../../src/domain/ingest";
+import { exportLedger, importLedger, ingest } from "../../src/domain/ingest";
+import { loadDemo } from "../../src/domain/seed";
 import { MemoryStore } from "../../src/domain/store";
 import type { Bill } from "../../src/domain/types";
-import { allSeed } from "./helpers";
+import { allSeed, seedLedger } from "./helpers";
 
 const seed = allSeed();
 const clone = (ref: string): Bill => structuredClone(seed.find((b) => b.ref === ref)!);
@@ -10,9 +11,9 @@ const clone = (ref: string): Bill => structuredClone(seed.find((b) => b.ref === 
 describe("US-17 audit trail", () => {
   it("records added, duplicate and rejected ingests, newest first", async () => {
     const s = new MemoryStore();
-    await ingest(s, clone("FYQQRQ"), { via: "ebill" });
-    await ingest(s, clone("FYQQRQ"), { via: "ebill" });
-    const bad = clone("YYLH0T");
+    await ingest(s, clone("DEM003"), { via: "ebill" });
+    await ingest(s, clone("DEM003"), { via: "ebill" });
+    const bad = clone("DEM005");
     bad.items[0].amount += 10;
     await ingest(s, bad, { via: "ebill" });
     const ev = await s.events();
@@ -20,12 +21,12 @@ describe("US-17 audit trail", () => {
     expect(ev[0].detail).toMatch(/Line items sum to printed gross/);
     expect(ev.every((e) => e.via === "ebill" && !!e.at)).toBe(true);
   });
-  it("seed writes one summary event, not one per bill", async () => {
+  it("loading the demo set writes one summary event, not one per bill", async () => {
     const s = new MemoryStore();
-    await seedLedger(s, seed);
+    await loadDemo(s);
     const ev = await s.events();
     expect(ev).toHaveLength(1);
-    expect(ev[0]).toMatchObject({ type: "seed", detail: "24 of 24 seed bills loaded" });
+    expect(ev[0]).toMatchObject({ type: "seed", detail: "24 of 24 demo bills loaded" });
   });
   it("export is logged and stamped", async () => {
     const s = new MemoryStore();
@@ -36,9 +37,9 @@ describe("US-17 audit trail", () => {
   });
   it("events are never edited: the log only grows", async () => {
     const s = new MemoryStore();
-    await ingest(s, clone("FYQQRQ"));
+    await ingest(s, clone("DEM003"));
     const before = await s.events();
-    await ingest(s, clone("FYQQRQ"));
+    await ingest(s, clone("DEM003"));
     const after = await s.events();
     expect(after).toHaveLength(before.length + 1);
     expect(after.slice(1)).toEqual(before);
@@ -69,13 +70,13 @@ describe("US-06 import is validated, reconciled and idempotent", () => {
   });
   it("a bill that fails reconciliation is rejected by name, even from a file", async () => {
     const s = new MemoryStore();
-    const bad = clone("FYQQRQ");
+    const bad = clone("DEM003");
     bad.net += 50;
     const r = await importLedger(s, file([bad]));
     expect(r.rejected).toEqual([
-      { ref: "FYQQRQ", failing: expect.arrayContaining(["Gross − discount = net"]) },
+      { ref: "DEM003", failing: expect.arrayContaining(["Gross − discount = net"]) },
     ]);
-    expect(await s.has("FYQQRQ")).toBe(false);
+    expect(await s.has("DEM003")).toBe(false);
   });
   it("rejects a file that is not JSON / not a ledger, changing nothing", async () => {
     const s = new MemoryStore();
@@ -89,23 +90,23 @@ describe("US-06 import is validated, reconciled and idempotent", () => {
   });
   it("reports shape-invalid bills instead of dropping them silently", async () => {
     const s = new MemoryStore();
-    const noItems = { ...clone("FYQQRQ"), ref: "NOITEM", items: [] };
-    const badDate = { ...clone("YYLH0T"), date: "2026-02-31" };
-    const badRef = { ...clone("YYLH0T"), ref: "../../etc" };
-    const r = await importLedger(s, file([noItems, badDate, badRef, clone("FYQQRQ")]));
+    const noItems = { ...clone("DEM003"), ref: "NOITEM", items: [] };
+    const badDate = { ...clone("DEM005"), date: "2026-02-31" };
+    const badRef = { ...clone("DEM005"), ref: "../../etc" };
+    const r = await importLedger(s, file([noItems, badDate, badRef, clone("DEM003")]));
     expect(r.added).toBe(1);
-    expect(r.invalid.map((i) => i.ref)).toEqual(["NOITEM", "YYLH0T", "../../etc"]);
+    expect(r.invalid.map((i) => i.ref)).toEqual(["NOITEM", "DEM005", "../../etc"]);
     expect(r.invalid[1].reason).toMatch(/date/);
   });
   it("strips unknown keys and cannot pollute prototypes", async () => {
     const s = new MemoryStore();
-    const b = JSON.parse(JSON.stringify(clone("FYQQRQ")));
+    const b = JSON.parse(JSON.stringify(clone("DEM003")));
     b.evil = "<script>";
     const raw = file([b]).replace('"evil"', '"__proto__"').replace('"<script>"', '{"polluted":true}');
     await importLedger(s, raw);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
-    expect(Object.keys((await s.get("FYQQRQ"))!)).not.toContain("evil");
-    expect(Object.keys((await s.get("FYQQRQ"))!)).not.toContain("__proto__");
+    expect(Object.keys((await s.get("DEM003"))!)).not.toContain("evil");
+    expect(Object.keys((await s.get("DEM003"))!)).not.toContain("__proto__");
   });
   it("refuses an oversized file before parsing it", async () => {
     const s = new MemoryStore();
@@ -113,7 +114,7 @@ describe("US-06 import is validated, reconciled and idempotent", () => {
   });
   it("logs one summary event for the import", async () => {
     const s = new MemoryStore();
-    await importLedger(s, file([clone("FYQQRQ")]));
+    await importLedger(s, file([clone("DEM003")]));
     const ev = await s.events();
     expect(ev).toHaveLength(1);
     expect(ev[0]).toMatchObject({

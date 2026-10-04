@@ -76,7 +76,7 @@ export function EbillPage({ onSaved }: { onSaved: () => Promise<void> }) {
             required
             inputMode="url"
             autoComplete="off"
-            placeholder="https://digibill.keellssuper.com/FYQQRQ"
+            placeholder="https://digibill.keellssuper.com/AB12CD"
             hint={ref ? `Reference detected: ${ref}` : "The reference is the last part of the link."}
             error={url && !ref ? "No 6-character bill code found in that link." : undefined}
             onChange={(v) => {

@@ -1,44 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { evaluate, fromOcr, lineStatus, blankDraft, type ReceiptDraft } from "../../src/domain/draft";
-import { receiptJson } from "./helpers";
+import { draftFromBill, ebillDate, rawText, seedBill } from "./helpers";
 
-function draftFromReceipt(ref: string): ReceiptDraft {
-  const r = receiptJson(ref);
-  return {
-    prefix: "GLO",
-    ticket: ref.replace("GLO", ""),
-    store: r.store,
-    storeCode: r.store_code,
-    date: r.date,
-    time: r.time,
-    printedGross: String(r.printed.gross),
-    printedDiscount: String(r.printed.discount),
-    printedNet: String(r.printed.net),
-    pointsEarned: String(r.points_earned),
-    pointsBalance: String(r.points_balance_printed),
-    loyaltyScheme: r.loyalty_scheme,
-    tenders: r.tenders.map((t: any) => ({ method: t.method, amount: String(t.amount) })),
-    lines: r.lines.map((l: any, i: number) => ({
-      ln: String(i + 1),
-      code: l.code,
-      name: l.name,
-      rate: String(l.rate),
-      qty: String(l.qty),
-      discount: String(l.discount ?? 0),
-      amount: String(l.amount),
-      scheme: l.scheme ?? "",
-    })),
-  };
-}
+const draftFromReceipt = (ref: string): ReceiptDraft => draftFromBill(seedBill(ref));
 
 describe("US-02 receipt draft (OCR confirmation table logic)", () => {
   it("a correctly transcribed receipt can be saved", () => {
-    const o = evaluate(draftFromReceipt("GLO549921"));
+    const o = evaluate(draftFromReceipt("GLO900003"));
     expect(o.problems).toEqual([]);
     expect(o.canSave).toBe(true);
   });
   it("one wrong digit disables saving and names the line", () => {
-    const d = draftFromReceipt("GLO549921");
+    const d = draftFromReceipt("GLO900003");
     d.lines[6].amount = String(Number(d.lines[6].amount) + 10);
     expect(lineStatus(d.lines[6]).ok).toBe(false);
     const o = evaluate(d);
@@ -46,12 +19,12 @@ describe("US-02 receipt draft (OCR confirmation table logic)", () => {
     expect(o.checks.some((c) => c.id === "lineArithmetic" && !c.ok && /line 7 /.test(c.detail))).toBe(true);
   });
   it("a wrong printed total disables saving", () => {
-    const d = draftFromReceipt("GLO549921");
+    const d = draftFromReceipt("GLO900003");
     d.printedNet = String(Number(d.printedNet) + 1);
     expect(evaluate(d).canSave).toBe(false);
   });
   it("blank figures are problems, not zeros", () => {
-    const d = draftFromReceipt("GLO549921");
+    const d = draftFromReceipt("GLO900003");
     d.lines[0].rate = "";
     d.printedDiscount = "";
     const o = evaluate(d);
@@ -85,7 +58,6 @@ describe("US-02 receipt draft (OCR confirmation table logic)", () => {
 
 import { parseNum } from "../../src/domain/draft";
 import { parseBill } from "../../src/domain/parse";
-import { rawText } from "./helpers";
 
 describe("US-02 draft validation details", () => {
   it("parseNum accepts separators and rejects blanks and junk — never defaults", () => {
@@ -96,7 +68,7 @@ describe("US-02 draft validation details", () => {
       expect(parseNum(bad)).toBeNull();
   });
   it("rejects malformed dates/times and duplicate line numbers and missing tenders", () => {
-    const d = draftFromReceipt("GLO549921");
+    const d = draftFromReceipt("GLO900003");
     d.date = "05/10/2026";
     d.time = "9:5";
     d.lines[1].ln = d.lines[0].ln;
@@ -108,7 +80,7 @@ describe("US-02 draft validation details", () => {
     expect(p).toMatch(/No tender line/);
   });
   it("non-numeric points are a problem, but blank points are allowed (optional)", () => {
-    const d = draftFromReceipt("GLO549921");
+    const d = draftFromReceipt("GLO900003");
     d.pointsEarned = "";
     d.pointsBalance = "";
     expect(evaluate(d).canSave).toBe(true);
@@ -119,10 +91,10 @@ describe("US-02 draft validation details", () => {
 
 describe("US-01 e-bill date validation", () => {
   it("rejects an impossible calendar date instead of rolling it over", () => {
-    const bad = rawText("FYQQRQ").replace("30-Jul-2026", "31-Feb-2026");
-    expect(() => parseBill(bad, "FYQQRQ")).toThrow(/not a valid date/);
-    const unknownMonth = rawText("FYQQRQ").replace("30-Jul-2026", "30-Xyz-2026");
-    expect(() => parseBill(unknownMonth, "FYQQRQ")).toThrow(/not a valid date/);
+    const bad = rawText("DEM003").replace(ebillDate(seedBill("DEM003").date), "31-Feb-2026");
+    expect(() => parseBill(bad, "DEM003")).toThrow(/not a valid date/);
+    const unknownMonth = rawText("DEM003").replace(ebillDate(seedBill("DEM003").date), "30-Xyz-2026");
+    expect(() => parseBill(unknownMonth, "DEM003")).toThrow(/not a valid date/);
   });
   it("fails loudly when there is no date/time header or no item lines", () => {
     expect(() => parseBill("nothing here", "ZZZZZZ")).toThrow(/date\/time header/);

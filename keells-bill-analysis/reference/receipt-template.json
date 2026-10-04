@@ -1,21 +1,19 @@
 {
-  "_comment": "Template for a photographed receipt with no e-bill link. Enter discount as a POSITIVE number however the receipt prints it; 'amount' is the post-discount figure shown on the receipt. transcribe_receipt.py recomputes rate x qty - discount for every line and checks the three totals against 'printed', so do not adjust figures to force a match.",
-  "ref": "GLO546052",
+  "_comment": "Template for a photographed receipt with no e-bill link. Every value here is invented. Enter discount as a POSITIVE number however the receipt prints it; 'amount' is the post-discount figure shown on the receipt. transcribe_receipt.py recomputes rate x qty - discount for every line and checks the three totals against 'printed', so do not adjust figures to force a match.",
+  "ref": "GLO900001",
   "source": "glomark",
-  "store": "Glomark Kottawa",
-  "store_code": "14006",
-  "date": "2026-09-02",
+  "store": "Glomark Demo Branch",
+  "store_code": "90000",
+  "date": "2026-06-17",
   "time": "18:56",
-  "points_earned": 53.97,
-  "points_balance_printed": 195,
+  "points_earned": 0.9,
+  "points_balance_printed": 100,
   "loyalty_scheme": "Softlogic One",
-  "printed": { "gross": 17655.86, "discount": 3823.22, "net": 13832.64 },
-  "tenders": [{ "method": "Visa Credit Card-1811", "amount": 13832.64 }],
-  "transcribed_from": "photograph of customer copy, ticket 546052",
+  "printed": { "gross": 250.5, "discount": 25.0, "net": 225.5 },
+  "tenders": [{ "method": "Visa Credit Card-0000", "amount": 225.5 }],
+  "transcribed_from": "photograph of customer copy",
   "lines": [
-    { "code": "310129", "name": "GARLIC", "rate": 920.0, "qty": 0.182,
-      "discount": 41.86, "amount": 125.58, "scheme": "Glomark Power Hours 25%" },
-    { "code": "113748", "name": "HAPPY HEN BROWN EGG LARGE 10S", "rate": 610.0,
-      "qty": 1, "discount": 0.0, "amount": 610.0, "scheme": null }
+    { "code": "100001", "name": "RICE 5KG", "rate": 100.0, "qty": 2, "discount": 25.0, "amount": 175.0, "scheme": "Glomark Power Hours 25%" },
+    { "code": "100002", "name": "SOAP", "rate": 50.5, "qty": 1, "discount": 0.0, "amount": 50.5, "scheme": null }
   ]
 }

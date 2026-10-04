@@ -227,7 +227,7 @@ export async function buildWorkbook(bills: Bill[], meta: ExportMeta): Promise<Ar
   });
   let sr = 5 + headRows.length + 1;
   sum.getCell(sr, 1).value =
-    "Keells totals are a floor, not a measurement: Keells prints a running points balance, and where that chain breaks a trip happened that is not in this ledger (about 35% of Keells spend in the starting data). The Capture Gap analysis arrives in a later release.";
+    "Keells totals are a floor, not a measurement: Keells prints a running points balance, and where that chain breaks a trip happened that is not in this ledger. The Capture Gap analysis arrives in a later release.";
   sum.getCell(sr, 1).font = { name: FONT, size: 10, bold: true, color: { argb: "FF7A4B00" } };
   sum.getCell(sr, 1).alignment = { wrapText: true, vertical: "top" };
   sum.mergeCells(sr, 1, sr, 4);

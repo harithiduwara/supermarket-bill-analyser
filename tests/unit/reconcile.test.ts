@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { money } from "../../src/domain/num";
 import { allPass, failures, reconcile } from "../../src/domain/reconcile";
 import type { Bill } from "../../src/domain/types";
 import { allSeed } from "./helpers";
 
 const seed = allSeed();
-const keells = (): Bill => structuredClone(seed.find((b) => b.ref === "FYQQRQ")!);
-const glomark = (): Bill => structuredClone(seed.find((b) => b.ref === "GLO549921")!);
+const keells = (): Bill => structuredClone(seed.find((b) => b.ref === "DEM003")!);
+const glomark = (): Bill => structuredClone(seed.find((b) => b.ref === "GLO900003")!);
 const failed = (b: Bill) => failures(reconcile(b)).map((c) => c.id);
 
 describe("US-04 every seed bill passes every applicable check", () => {
@@ -33,7 +34,7 @@ describe("US-04 / NFR-01 a deliberately corrupted bill is caught, with the arith
     b.items[0].amount += 10;
     expect(failed(b)).toEqual(["itemsEqualGross"]);
     const c = reconcile(b).find((x) => x.id === "itemsEqualGross")!;
-    expect(c.detail).toMatch(/printed gross 4,367\.56/);
+    expect(c.detail).toContain(`printed gross ${money(b.gross)}`);
     expect(c.detail).toMatch(/diff \+10\.00/);
   });
   it("a wrong printed net fails gross−discount=net and tenders", () => {

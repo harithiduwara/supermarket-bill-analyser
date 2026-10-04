@@ -86,7 +86,7 @@ export function memoryKV(): KV {
 }
 
 /** Backup reminder (US-06): due once changes the USER made — bills added or imported — have gone
- * unexported for `days`. The starting data is reproducible from the app, so it never triggers a nag.
+ * unexported for `days`. Demo bills are reproducible from the app, so it never triggers a nag.
  * `unexportedSince` is the time of the oldest change not covered by the last export, or null if none. */
 export function backupDue(unexportedSince: Date | null, now: Date = new Date(), days = 14): boolean {
   if (!unexportedSince) return false;

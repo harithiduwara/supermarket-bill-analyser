@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { openApp, rawBill } from "./helpers";
+import { demoBill, openApp, rawBill } from "./helpers";
 
 const url = "https://digibill.keellssuper.com/";
 
@@ -9,7 +9,7 @@ test.describe("e-bill ingest", () => {
   }) => {
     await openApp(page, "#/add/ebill");
     await page.getByLabel(/Link or 6-character code/).fill(`${url}TEST01`);
-    await page.getByLabel(/Paste the page text/).fill(rawBill("FYQQRQ"));
+    await page.getByLabel(/Paste the page text/).fill(rawBill("DEM003"));
     await expect(page.getByText("Reference detected: TEST01")).toBeVisible();
     await expect(page.getByText("✓ Pass", { exact: true })).toHaveCount(5);
     await page.getByRole("button", { name: "Save to ledger" }).click();
@@ -21,7 +21,7 @@ test.describe("e-bill ingest", () => {
     // the same reference again — even with different content — is a no-op
     await openApp(page, "#/add/ebill");
     await page.getByLabel(/Link or 6-character code/).fill(`${url}TEST01`);
-    await page.getByLabel(/Paste the page text/).fill(rawBill("YYLH0T"));
+    await page.getByLabel(/Paste the page text/).fill(rawBill("DEM005"));
     await page.getByRole("button", { name: "Save to ledger" }).click();
     await expect(page.getByText("TEST01 is already in the ledger — nothing was changed.")).toBeVisible();
     await page.getByRole("link", { name: "Ledger", exact: true }).click();
@@ -31,17 +31,23 @@ test.describe("e-bill ingest", () => {
   test("US-04 a corrupted bill is blocked, names the failing check and shows the arithmetic", async ({
     page,
   }) => {
-    const bad = rawBill("FYQQRQ").replace(
-      "| 149.00   | 1.0   | 149.00   |",
-      "| 149.00   | 1.0   | 159.00   |",
+    // corrupt the first line's amount by +10 in the page text; every other figure is untouched
+    const original = rawBill("DEM003");
+    const lines = original.split("\n");
+    const row = lines.findIndex((l) => /^\| 1\s+\|/.test(l));
+    lines[row] = lines[row].replace(
+      /([\d,]+\.\d{2})(\s*\|\s*)$/,
+      (_m, amt: string, tail: string) => `${(Number(amt.replace(/,/g, "")) + 10).toFixed(2)}${tail}`,
     );
-    expect(bad).not.toBe(rawBill("FYQQRQ"));
+    const bad = lines.join("\n");
+    expect(bad).not.toBe(original);
+    const gross = demoBill("DEM003").gross.toLocaleString("en-US", { minimumFractionDigits: 2 });
     await openApp(page, "#/add/ebill");
     await page.getByLabel(/Link or 6-character code/).fill("BAD001");
     await page.getByLabel(/Paste the page text/).fill(bad);
     await expect(page.getByRole("button", { name: "Save to ledger" })).toBeDisabled();
     await expect(page.getByText("✕ FAIL")).toBeVisible();
-    await expect(page.getByText(/printed gross 4,367\.56 \(diff \+10\.00\)/)).toBeVisible();
+    await expect(page.getByText(`printed gross ${gross} (diff +10.00)`)).toBeVisible();
     await expect(page.getByText(/tolerance is Rs 0\.02 and is never widened/)).toBeVisible();
   });
 
@@ -65,7 +71,7 @@ test.describe("e-bill ingest", () => {
 test.describe("US-01 page source as well as page text", () => {
   test("a bill pasted as an HTML table is converted and parsed", async ({ page }) => {
     // Synthetic markup built from the saved text — NOT the live digibill page (ADR-0002 records that as unverified).
-    const rows = rawBill("FYQQRQ")
+    const rows = rawBill("DEM003")
       .split("\n")
       .filter((l) => l.startsWith("|") && !/^\|[\s|-]*\|$/.test(l.trim()))
       .map(
@@ -77,7 +83,7 @@ test.describe("US-01 page source as well as page text", () => {
             .join("")}</tr>`,
       )
       .join("");
-    const tail = rawBill("FYQQRQ")
+    const tail = rawBill("DEM003")
       .split("\n")
       .filter((l) => !l.startsWith("|"))
       .map((l) => `<p>${l}</p>`)

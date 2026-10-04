@@ -8,6 +8,8 @@ export interface LedgerStore {
   add(bill: Bill, images?: Blob[]): Promise<void>;
   all(): Promise<Bill[]>;
   images(ref: string): Promise<Blob[]>;
+  /** delete bills (and their photos). Only used to remove the demo set; the audit log records it. */
+  remove(refs: string[]): Promise<void>;
   /** append-only; never edited or deleted */
   log(event: Omit<AuditEvent, "id" | "at">, at?: Date): Promise<void>;
   /** newest first */
@@ -33,6 +35,12 @@ export class MemoryStore implements LedgerStore {
   }
   async all() {
     return [...this.bills.values()];
+  }
+  async remove(refs: string[]) {
+    for (const r of refs) {
+      this.bills.delete(r);
+      this.imgs.delete(r);
+    }
   }
   async images(ref: string) {
     return this.imgs.get(ref) ?? [];

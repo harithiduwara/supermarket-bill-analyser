@@ -25,8 +25,8 @@ const routes: { name: string; hash: string; prepare?: (p: Page) => Promise<void>
     },
   },
   { name: "ledger", hash: "#/ledger" },
-  { name: "bill", hash: "#/bill/FYQQRQ" },
-  { name: "glomark bill", hash: "#/bill/GLO549921" },
+  { name: "bill", hash: "#/bill/DEM003" },
+  { name: "glomark bill", hash: "#/bill/GLO900003" },
   { name: "add e-bill", hash: "#/add/ebill" },
   { name: "add receipt", hash: "#/add/receipt" },
   {
@@ -65,6 +65,9 @@ for (const scheme of ["light", "dark"] as const) {
 test.describe("US-20 keyboard operation", () => {
   test("a skip link, visible focus, and focus moves to the page heading on navigation", async ({ page }) => {
     await openApp(page);
+    // a genuine first load: focus must not have been moved to the heading yet (the skip link comes first)
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
     await page.keyboard.press("Enter");
@@ -88,7 +91,7 @@ test.describe("US-20 keyboard operation", () => {
   });
 
   test("status is conveyed by text as well as colour", async ({ page }) => {
-    await openApp(page, "#/bill/FYQQRQ");
+    await openApp(page, "#/bill/DEM003");
     await expect(page.getByText("✓ All checks pass")).toBeVisible();
   });
 });

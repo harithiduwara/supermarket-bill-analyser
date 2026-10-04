@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { defaultQuery, queryLedger, type LedgerQuery, type SortKey } from "../../domain/ledgerView";
 import { backupDue, oldestUnexportedChange, settings } from "../../settings";
+import { DemoBanner } from "../components/DemoBanner";
 import { FloorCaveat } from "../components/FloorCaveat";
 import { PageHeader } from "../components/PageHeader";
 import { StatusBadge } from "../components/StatusBadge";
@@ -60,6 +61,7 @@ export function LedgerPage() {
         }
       />
 
+      <DemoBanner />
       {remindBackup && (
         <div className="banner info" role="note">
           <strong>Update your workbook.</strong> It has been over 14 days since you added bills that are not
@@ -239,6 +241,11 @@ export function LedgerPage() {
                       </td>
                       <td data-label="Ref">
                         <a href={href.bill(b.ref)}>{b.ref}</a>
+                        {b.demo && (
+                          <span className="badge neutral" style={{ marginLeft: 6 }}>
+                            demo
+                          </span>
+                        )}
                       </td>
                       <td data-label="Store">{b.store}</td>
                       <td data-label="Lines" className="num">

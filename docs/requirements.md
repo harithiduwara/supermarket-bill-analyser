@@ -55,8 +55,8 @@ Priority is MoSCoW. Phase is the delivery phase. Status: ✅ built · 🔨 this 
 **US-01 Add a Keells e-bill** — Must · P1 · ✅
 As P1, I paste a digibill link and the page content so that the bill is added to the ledger.
 
-- Given a link `…/FYQQRQ` and the page content, when I paste both, then the bill is parsed and the reference
-  `FYQQRQ` is taken from the link.
+- Given a link `…/AB12CD` and the page content, when I paste both, then the bill is parsed and the reference
+  `AB12CD` is taken from the link.
 - Given either summary layout (bullet list or wide table row), then the totals parse identically.
 - Given the page has no Gross or Net line, then parsing fails with a message; nothing is defaulted to 0.
 
@@ -139,6 +139,13 @@ As P1, I import my previously exported workbook, then add new bills, so that I n
   state: bills in the ledger, bills added since the last export, last export time.
 - Given bills were added since the last export, then I am told plainly that the workbook on disk is out of date.
 
+**US-26 Demo data is clearly fake, removable, and never exported** — Must · P1 · 🔨
+
+- Given a new visitor, then the ledger is empty and a "Load demo data" action offers generated sample bills.
+- Given demo bills are loaded, then every screen marks them as demo, and I can remove exactly those (my own bills stay).
+- Given I export a workbook or a JSON backup, then demo bills are never included.
+- Given the repository or the built bundle, then it contains no real customer data (ADR-0007; `npm run check:privacy`).
+
 **US-17 Audit trail** — Should · P2 · 🔨
 
 - Given any ingest, import, export or seed, then an append-only event is recorded with time, type, reference,
@@ -174,7 +181,7 @@ status not conveyed by colour alone, announced results, no contrast failures, re
 | ID     | Category        | Requirement                                                                                                                         | Verified by                                                                               |
 | ------ | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | NFR-01 | Correctness     | Reconciliation tolerance is 0.02 and is never widened                                                                               | unit tests (`reconcile.test`)                                                             |
-| NFR-02 | Correctness     | The TS port reproduces the Python ledger on all 24 bills                                                                            | `seed.test`                                                                               |
+| NFR-02 | Correctness     | The TS port reproduces the Python rules (synthetic round-trip tests; optional private parity run, ADR-0007)                         | `seed.test`                                                                               |
 | NFR-03 | Integrity       | Nothing derived is stored; imports and OCR output are validated as untrusted input                                                  | `audit.test` (import), `ocr.test` (OCR output)                                            |
 | NFR-04 | Security        | CSP restricts scripts to self and network to api.anthropic.com                                                                      | e2e (no CSP violations)                                                                   |
 | NFR-05 | Security        | API key is held for the browser tab only by default; persisting it is opt-in and revocable                                          | `settings.test`, e2e `settings.spec`                                                      |

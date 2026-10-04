@@ -1,17 +1,44 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const here = path.dirname(fileURLToPath(import.meta.url));
 import { expect, type Page, type Route } from "@playwright/test";
 
-export const rawBill = (ref: string): string =>
-  fs.readFileSync(path.resolve(here, "../../src/seed/raw", `${ref}.md`), "utf8");
+/** The rendered e-bill text of a synthetic demo Keells bill, as the e-bill page would read. */
+export const rawBill = (ref: string): string => {
+  const t = demoBills().find((b) => b.ref === ref)?.rawText;
+  if (!t) throw new Error(`no demo e-bill ${ref}`);
+  return t;
+};
+/** The synthetic bill itself (for its store, totals, dates…). */
+export const demoBill = (ref: string) => {
+  const b = demoBills().find((x) => x.ref === ref);
+  if (!b) throw new Error(`no demo bill ${ref}`);
+  return b;
+};
 
-export async function openApp(page: Page, hash = "#/ledger"): Promise<void> {
-  await page.goto(`/${hash}`);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+export type StartingData =
+  | "workbook" // the 24 synthetic bills arrive the way a real user's would: by importing a workbook (default)
+  | "demo" //     the built-in demo set, flagged as demo
+  | "empty"; //    a brand-new visitor
+
+/** Open the app. Every test gets a fresh browser profile, so the ledger starts EMPTY; choose what to put in it. */
+export async function openApp(page: Page, hash = "#/ledger", data: StartingData = "workbook"): Promise<void> {
+  await page.goto("/#/");
+  await expect(page.getByRole("heading", { level: 1, name: "Workbook" })).toBeVisible();
   await expect(page.getByText("Loading your ledger")).toHaveCount(0);
+  const seeded = await page.evaluate(() => sessionStorage.getItem("test-seeded"));
+  if (!seeded) {
+    if (data === "demo") {
+      await page.getByRole("button", { name: "Load demo data" }).click();
+      await expect(page.getByText("Demo data.")).toBeVisible();
+    } else if (data === "workbook") {
+      await page.locator('.dropzone input[type="file"]').setInputFiles(await workbookFile());
+      await expect(page.getByText(/24 added, 0 already present/)).toBeVisible();
+    }
+    await page.evaluate(() => sessionStorage.setItem("test-seeded", "1"));
+  }
+  if (hash !== "#/") {
+    await page.goto(`/${hash}`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByText("Loading your ledger")).toHaveCount(0);
+  }
 }
 
 /** Label text of a required field includes a decorative " *"; match the name exactly regardless. */
@@ -67,6 +94,7 @@ export async function mockAnthropic(page: Page, replies: object[]): Promise<{ ca
   return { calls: () => n };
 }
 
+import { demoBills } from "../../src/domain/demo";
 import { buildWorkbook } from "../../src/export/xlsx";
 import type { Bill } from "../../src/domain/types";
 import { allSeed } from "../unit/helpers";
