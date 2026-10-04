@@ -90,6 +90,7 @@ export function normaliseSummaryLines(lines: string[]): string[] {
 export const MAX_PASTE_CHARS = 2_000_000;
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+/** Decodes a fixed set of entities in ONE pass, so `&amp;lt;` becomes the text `&lt;`, never `<`. */
 const decodeEntities = (t: string): string =>
   t.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (m, e: string) => {
     if (e[0] === "#") {
@@ -98,29 +99,99 @@ const decodeEntities = (t: string): string =>
     }
     return ENTITIES[e.toLowerCase()] ?? m;
   });
-const stripTags = (t: string): string => t.replace(/<[^>]*>/g, "");
+
+const BLOCK_ENDS = new Set([
+  "p",
+  "div",
+  "li",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "section",
+  "ul",
+  "ol",
+  "table",
+]);
+const SKIP_CONTENT = new Set(["script", "style", "head"]);
 
 /** Best-effort conversion of a pasted page's HTML to the pipe-table text the parser expects.
  *
- * Plain string handling — no DOM and no HTML parser — so the pasted text is never interpreted as markup, the
- * function runs in Node as well as the browser, and it is unit-tested against every saved bill.
+ * A single left-to-right scan, not a chain of replacements: every tag is consumed once as a tag and its text is
+ * kept or dropped, so nothing can be re-assembled into a tag between passes, and the result is plain text by
+ * construction (any `<` left in it was a literal `<` in the page's text). No DOM and no HTML parser, so it runs
+ * in Node as well as the browser and is unit-tested against every saved bill.
  * UNVERIFIED against the live digibill HTML (the host is not reachable from the build sandbox and the seed holds
  * only fetched text). If a real bill fails to parse, the first fix to try is pasting the visible text. */
 export function htmlToText(html: string): string {
   if (html.length > MAX_PASTE_CHARS) throw new Error("the pasted page is too large to be a bill");
-  if (!/<\w+[^>]*>/.test(html)) return html;
-  const s = html
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<(script|style|head)\b[\s\S]*?<\/\1\s*>/gi, "")
-    // a table row becomes one "| cell | cell |" line, as in the saved e-bill text
-    .replace(/<tr\b[^>]*>([\s\S]*?)<\/tr\s*>/gi, (_m, row: string) => {
-      const cells = [...row.matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]\s*>/gi)].map((c) =>
-        decodeEntities(stripTags(c[1])).replace(/\s+/g, " ").trim(),
-      );
-      return `\n| ${cells.join(" | ")} |\n`;
-    })
-    .replace(/<br\s*\/?>|<\/(p|div|li|h[1-6]|section|ul|ol|table)\s*>/gi, "\n");
-  return decodeEntities(stripTags(s)).replace(/\n{3,}/g, "\n\n");
+  if (!/<\w+[^>]*>/.test(html)) return html; // plain text pasted: leave it exactly as it is
+
+  const lower = html.toLowerCase();
+  const out: string[] = [];
+  let row: string[] | null = null; // cells of the <tr> being read
+  let cell: string[] | null = null; // text of the <td>/<th> being read
+  const text = (t: string) => (cell ?? out).push(decodeEntities(t));
+  const endCell = () => {
+    if (cell && row) row.push(cell.join("").replace(/\s+/g, " ").trim());
+    cell = null;
+  };
+  const endRow = () => {
+    endCell();
+    if (row) out.push(`\n| ${row.join(" | ")} |\n`);
+    row = null;
+  };
+
+  const n = html.length;
+  let i = 0;
+  while (i < n) {
+    const lt = html.indexOf("<", i);
+    if (lt === -1) {
+      text(html.slice(i));
+      break;
+    }
+    text(html.slice(i, lt));
+    if (html.startsWith("<!--", lt)) {
+      const end = html.indexOf("-->", lt + 4);
+      i = end === -1 ? n : end + 3;
+      continue;
+    }
+    const gt = html.indexOf(">", lt + 1);
+    if (gt === -1) {
+      text(html.slice(lt)); // a stray "<" with no ">" after it is just text
+      break;
+    }
+    const m = /^(\/?)([a-zA-Z][a-zA-Z0-9]*)/.exec(html.slice(lt + 1, gt));
+    if (!m) {
+      text("<"); // "<3", "< 5": not a tag, keep the character
+      i = lt + 1;
+      continue;
+    }
+    const closing = m[1] === "/";
+    const name = m[2].toLowerCase();
+    i = gt + 1;
+
+    if (!closing && SKIP_CONTENT.has(name)) {
+      const close = lower.indexOf(`</${name}`, i);
+      const closeEnd = close === -1 ? -1 : html.indexOf(">", close);
+      i = closeEnd === -1 ? n : closeEnd + 1;
+    } else if (name === "tr") {
+      endRow();
+      if (!closing) row = [];
+    } else if (name === "td" || name === "th") {
+      endCell();
+      if (!closing && row) cell = [];
+    } else if (closing && (name === "table" || name === "tbody" || name === "thead" || name === "tfoot")) {
+      endRow(); // a browser ends an open row here, so text after the table is not part of its last cell
+      if (name === "table") text("\n");
+    } else if (name === "br" || (closing && BLOCK_ENDS.has(name))) {
+      text("\n");
+    }
+  }
+  endRow();
+  return out.join("").replace(/\n{3,}/g, "\n\n");
 }
 
 export function parseBill(text: string, ref: string): Bill {

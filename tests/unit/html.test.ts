@@ -83,4 +83,40 @@ describe("US-01 pasted page source is converted without interpreting it as marku
     htmlToText("<tr><td>a<td>b" + "<script".repeat(2000) + "<p>".repeat(2000));
     expect(performance.now() - t0).toBeLessThan(2000);
   });
+
+  it("cannot be tricked into re-assembling a tag from fragments (the incomplete-sanitization class)", () => {
+    for (const evil of [
+      "<scr<!-- -->ipt>alert(1)</script>",
+      "<<script>script>alert(1)<</script>/script>",
+      "<scr<script></script>ipt>alert(1)</scr</script>ipt>",
+      "<!--<script>-->alert(1)<!--</script>-->",
+      "<img src=x onerror=alert(1)//",
+      '<a href="x"<b>>click',
+    ]) {
+      const out = htmlToText(`<p>ok</p>${evil}<p>end</p>`);
+      // no OPENING tag survives. (A literal "<" beside literal "/script>" can read as "</script>" — still just text,
+      // which only reaches the bill parser and React text nodes; dropping a real "<" would alter item names.)
+      expect(out, evil).not.toMatch(/<\s*(script|img|a|b)\b/i);
+      expect(out, evil).toContain("ok");
+    }
+  });
+  it("keeps a literal < or > that is real text", () => {
+    expect(htmlToText("<p>1 < 2 and 3 > 2 and a <3 b</p>").trim()).toBe("1 < 2 and 3 > 2 and a <3 b");
+  });
+  it("handles unclosed rows and cells, and text outside any row", () => {
+    const out = htmlToText("before<table><tr><td>a<td>b<tr><td>c</table>after");
+    expect(out).toContain("| a | b |");
+    expect(out).toContain("| c |");
+    expect(out.startsWith("before")).toBe(true);
+    expect(out.trim().endsWith("after")).toBe(true);
+  });
+  it("ignores cells outside a row and unknown tags, and is case-insensitive", () => {
+    expect(htmlToText("<TD>x</TD><SPAN>y</SPAN><TR><TH>H</TH></TR>").replace(/\s+/g, " ").trim()).toBe(
+      "xy | H |",
+    );
+  });
+  it("skips a script or style that is never closed, without hanging", () => {
+    expect(htmlToText("<p>keep</p><script>var a = 1;").trim()).toBe("keep");
+    expect(htmlToText("<p>keep</p><style>p{").trim()).toBe("keep");
+  });
 });
