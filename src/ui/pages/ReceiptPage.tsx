@@ -8,11 +8,12 @@ import {
   parseNum,
   type ReceiptDraft,
 } from "../../domain/draft";
-import { isRasterImage, RASTER_MESSAGE, blobSrc } from "../../domain/images";
+import { isRasterImage, RASTER_MESSAGE } from "../../domain/images";
 import { ingest } from "../../domain/ingest";
 import { mergeDrafts, transcribeImage, type OcrDraft } from "../../domain/ocr";
 import type { IngestResult } from "../../domain/types";
 import { settings } from "../../settings";
+import { BlobCanvas } from "../components/BlobCanvas";
 import { CheckList } from "../components/CheckList";
 import { Field } from "../components/Field";
 import { PageHeader } from "../components/PageHeader";
@@ -476,17 +477,11 @@ export function ReceiptPage({ onSaved }: { onSaved: () => Promise<void> }) {
 }
 
 function PhotoStrip({ files, onRemove }: { files: File[]; onRemove: (i: number) => void }) {
-  const urls = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
-  // object URLs are revoked by PhotoViewer's own copies; these thumbnails are short-lived
   return (
     <ul className="thumbs" style={{ listStyle: "none", padding: 0 }} aria-label="Selected photos">
       {files.map((f, i) => (
         <li className="thumb" key={`${f.name}-${i}`}>
-          <img
-            src={blobSrc(urls[i])}
-            alt={`Page ${i + 1}: ${f.name}`}
-            onLoad={() => URL.revokeObjectURL(urls[i])}
-          />
+          <BlobCanvas blob={f} label={`Page ${i + 1}: ${f.name}`} maxSide={160} />
           <button className="remove" aria-label={`Remove photo ${i + 1}`} onClick={() => onRemove(i)}>
             ✕
           </button>

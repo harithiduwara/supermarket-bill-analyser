@@ -545,7 +545,8 @@ ol.checks .detail {
 .thumb {
   position: relative;
 }
-.thumb img {
+.thumb img,
+.thumb canvas {
   height: 72px;
   width: 72px;
   object-fit: cover;
@@ -561,7 +562,8 @@ ol.checks .detail {
   display: block;
   border-radius: 6px;
 }
-.thumb button.pick[aria-pressed="true"] img {
+.thumb button.pick[aria-pressed="true"] img,
+.thumb button.pick[aria-pressed="true"] canvas {
   border-color: var(--accent);
 }
 .thumb .remove {
@@ -592,7 +594,8 @@ ol.checks .detail {
     top: 8px;
   }
 }
-.viewer .frame img {
+.viewer .frame img,
+.viewer .frame canvas {
   width: 100%;
   height: auto;
   border-radius: 6px;
@@ -604,7 +607,8 @@ ol.checks .detail {
   overflow: auto;
   border-radius: 6px;
 }
-.viewer .frame img.zoom {
+.viewer .frame img.zoom,
+.viewer .frame canvas.zoom {
   width: 190%;
   max-width: none;
 }

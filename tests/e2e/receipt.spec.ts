@@ -235,4 +235,31 @@ test.describe("US-02 photo receipt with confirmation", () => {
     await expect(page.getByRole("list", { name: "Selected photos" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: /^Read/ })).toBeDisabled();
   });
+
+  test("photos are painted on a canvas — real pixels, no <img src> anywhere", async ({ page }) => {
+    await openApp(page, "#/add/receipt");
+    await page.locator('.dropzone input[type="file"]').setInputFiles([
+      { name: "a.png", mimeType: "image/png", buffer: PNG },
+      { name: "b.png", mimeType: "image/png", buffer: PNG },
+    ]);
+    await page.getByRole("button", { name: "Enter by hand instead" }).click();
+    const viewer = page.getByRole("region", { name: "Receipt photo" });
+    await expect(viewer).toBeVisible();
+    await expect(viewer.getByRole("img", { name: "Receipt, page 1" })).toBeVisible();
+    await viewer.getByRole("button", { name: "Show photo 2" }).click();
+    await expect(viewer.getByRole("img", { name: "Receipt, page 2" })).toBeVisible();
+    // the canvas really holds decoded pixels (alpha > 0), not an empty surface
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const c = document.querySelector<HTMLCanvasElement>(
+            '[aria-label="Scrollable receipt image"] canvas',
+          );
+          const d = c?.getContext("2d")?.getImageData(0, 0, 1, 1).data;
+          return d ? d[3] : -1;
+        }),
+      )
+      .toBeGreaterThan(0);
+    expect(await page.locator("img[src]").count()).toBe(0);
+  });
 });

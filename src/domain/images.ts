@@ -6,6 +6,3 @@ export const isRasterImage = (b: { type: string }): boolean =>
   (RASTER_TYPES as readonly string[]).includes(b.type.toLowerCase());
 
 export const RASTER_MESSAGE = "Only JPEG, PNG, WebP or GIF photos can be added.";
-
-/** Only ever hand the browser a `blob:` URL created by this page — never a URL built from data. */
-export const blobSrc = (url: string): string | undefined => (url.startsWith("blob:") ? url : undefined);
