@@ -3,6 +3,8 @@ import { DexieStore } from "../db/db";
 import type { Bill } from "../domain/types";
 import { requestPersistence } from "../storage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { Icon } from "./components/Icon";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { useToasts } from "./components/Toasts";
 import { AppContext } from "./context";
 import { href, useRoute, type Route } from "./router";
@@ -14,13 +16,36 @@ import { WorkbookPage } from "./pages/WorkbookPage";
 import { ReceiptPage } from "./pages/ReceiptPage";
 import { SettingsPage } from "./pages/SettingsPage";
 
-const NAV: { to: string; label: string; short: string; match: Route["name"][] }[] = [
-  { to: href.workbook, label: "Workbook", short: "Workbook", match: ["workbook"] },
-  { to: href.ledger, label: "Ledger", short: "Ledger", match: ["ledger", "bill"] },
-  { to: href.receipt, label: "Add receipt", short: "Receipt", match: ["receipt"] },
-  { to: href.ebill, label: "Add e-bill", short: "E-bill", match: ["ebill"] },
-  { to: href.activity, label: "Activity", short: "Activity", match: ["activity"] },
-  { to: href.settings, label: "Settings", short: "Settings", match: ["settings"] },
+interface NavItem {
+  to: string;
+  label: string;
+  short: string;
+  icon: string;
+  match: Route["name"][];
+}
+
+const NAV: { group: string; items: NavItem[] }[] = [
+  {
+    group: "Records",
+    items: [
+      { to: href.workbook, label: "Workbook", short: "Workbook", icon: "workbook", match: ["workbook"] },
+      { to: href.ledger, label: "Ledger", short: "Ledger", icon: "ledger", match: ["ledger", "bill"] },
+    ],
+  },
+  {
+    group: "Capture",
+    items: [
+      { to: href.receipt, label: "Add receipt", short: "Receipt", icon: "camera", match: ["receipt"] },
+      { to: href.ebill, label: "Add e-bill", short: "E-bill", icon: "receipt", match: ["ebill"] },
+    ],
+  },
+  {
+    group: "System",
+    items: [
+      { to: href.activity, label: "Activity", short: "Activity", icon: "activity", match: ["activity"] },
+      { to: href.settings, label: "Settings", short: "Settings", icon: "settings", match: ["settings"] },
+    ],
+  },
 ];
 
 const TITLES: Record<Route["name"], string> = {
@@ -105,54 +130,86 @@ function Shell() {
       >
         Skip to content
       </a>
-      <header className="topbar">
-        <div className="topbar-in">
+      <div className="app">
+        <aside className="side">
           <a className="brand" href={href.workbook}>
+            <span className="logo" aria-hidden="true">
+              <Icon name="receipt" size={18} />
+            </span>
             Grocery ledger
           </a>
           <nav className="primary" aria-label="Primary">
-            {NAV.map((n) => (
-              <a key={n.to} href={n.to} aria-current={n.match.includes(route.name) ? "page" : undefined}>
-                {/* two labels, switched by CSS: the hidden one leaves the accessibility tree, so the visible text is the name */}
-                <span className="long">{n.label}</span>
-                <span className="short">{n.short}</span>
-              </a>
+            {NAV.map((g) => (
+              <div className="nav-group" key={g.group}>
+                <p className="nav-label" aria-hidden="true">
+                  {g.group}
+                </p>
+                {g.items.map((n) => (
+                  <a key={n.to} href={n.to} aria-current={n.match.includes(route.name) ? "page" : undefined}>
+                    <Icon name={n.icon} />
+                    {/* two labels, switched by CSS: the hidden one leaves the accessibility tree, so the visible text is the name */}
+                    <span className="long">{n.label}</span>
+                    <span className="short">{n.short}</span>
+                  </a>
+                ))}
+              </div>
             ))}
           </nav>
-        </div>
-      </header>
-      <main id="main">
-        {fatal && (
-          <div className="banner bad" role="alert">
-            <strong>The ledger could not be opened.</strong> {fatal}
+          <div className="side-foot">
+            <p className="side-stat">
+              <span className={`dot${bills && bills.length ? " on" : ""}`} aria-hidden="true" />
+              {bills ? `Ledger: ${bills.length} ${bills.length === 1 ? "bill" : "bills"}` : "Ledger: loading"}
+            </p>
+            <p className="side-note">
+              <Icon name="lock" size={14} /> Stored on this device only
+            </p>
           </div>
-        )}
-        {!ctx ? (
-          fatal ? null : (
-            <p role="status">Loading your ledger…</p>
-          )
-        ) : (
-          <AppContext.Provider value={ctx}>
-            {route.name === "workbook" && <WorkbookPage onChanged={afterSave} />}
-            {route.name === "ledger" && <LedgerPage />}
-            {route.name === "bill" && <BillPage billRef={route.ref} />}
-            {route.name === "ebill" && <EbillPage onSaved={afterSave} />}
-            {route.name === "receipt" && <ReceiptPage onSaved={afterSave} />}
-            {route.name === "activity" && <ActivityPage />}
-            {route.name === "settings" && <SettingsPage onChanged={afterSave} />}
-            {route.name === "notfound" && (
-              <div className="card empty">
-                <h1 id="page-title" tabIndex={-1} style={{ fontSize: "1.2rem" }}>
-                  Page not found
-                </h1>
-                <p>
-                  <a href={href.ledger}>Back to the ledger</a>
-                </p>
+        </aside>
+        <div className="content">
+          <header className="topbar">
+            <a className="brand mobile-brand" href={href.workbook}>
+              Grocery ledger
+            </a>
+            <ThemeToggle />
+          </header>
+          <main id="main">
+            {fatal && (
+              <div className="banner bad" role="alert">
+                <strong>The ledger could not be opened.</strong> {fatal}
               </div>
             )}
-          </AppContext.Provider>
-        )}
-      </main>
+            {!ctx ? (
+              fatal ? null : (
+                <div role="status" className="loading">
+                  <p>Loading your ledger…</p>
+                  <div className="skeleton" aria-hidden="true" />
+                  <div className="skeleton short" aria-hidden="true" />
+                </div>
+              )
+            ) : (
+              <AppContext.Provider value={ctx}>
+                {route.name === "workbook" && <WorkbookPage onChanged={afterSave} />}
+                {route.name === "ledger" && <LedgerPage />}
+                {route.name === "bill" && <BillPage billRef={route.ref} />}
+                {route.name === "ebill" && <EbillPage onSaved={afterSave} />}
+                {route.name === "receipt" && <ReceiptPage onSaved={afterSave} />}
+                {route.name === "activity" && <ActivityPage />}
+                {route.name === "settings" && <SettingsPage onChanged={afterSave} />}
+                {route.name === "notfound" && (
+                  <div className="card empty">
+                    <h1 id="page-title" tabIndex={-1} style={{ fontSize: "1.2rem" }}>
+                      Page not found
+                    </h1>
+                    <p>
+                      <a href={href.ledger}>Back to the ledger</a>
+                    </p>
+                  </div>
+                )}
+              </AppContext.Provider>
+            )}
+          </main>
+        </div>
+      </div>
       {toastView}
     </>
   );

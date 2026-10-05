@@ -146,6 +146,13 @@ As P1, I import my previously exported workbook, then add new bills, so that I n
 - Given I export a workbook or a JSON backup, then demo bills are never included.
 - Given the repository or the built bundle, then it contains no real customer data (ADR-0007; `npm run check:privacy`).
 
+**US-27 App shell and colour theme** — Should · P2 · 🔨
+
+- Given a desktop screen, then a sidebar groups the destinations (records, capture, system), marks the current page,
+  and shows how many bills the ledger holds and that they are stored on this device only.
+- Given a phone, then the same destinations are a bottom tab bar with icons and short labels.
+- Given I choose light or dark, then the choice is remembered on this device; "system" follows the device again.
+
 **US-17 Audit trail** — Should · P2 · 🔨
 
 - Given any ingest, import, export or seed, then an append-only event is recorded with time, type, reference,

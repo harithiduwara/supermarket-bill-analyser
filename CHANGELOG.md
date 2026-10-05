@@ -11,6 +11,10 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ### Changed
 
+- **Enterprise-style interface** (US-27): sidebar app shell with grouped navigation and ledger status on desktop, icon
+  tab bar on phones; light / dark / system theme switch; refreshed design tokens, cards, KPI tiles, tables, banners and
+  buttons; loading skeleton. No behaviour changed.
+
 - The app now starts empty. **Load demo data** generates fake bills (US-26); they are marked as demo, removable, and
   never exported. Tests run on generated bills; a private parity test runs only with `REAL_FIXTURES_DIR`.
 - Added `npm run check:privacy` (hashed-identifier guard) to `verify` and CI.
