@@ -22,7 +22,10 @@ export interface BillItem {
   netAmount?: number;
 }
 
-export interface Tender { method: string; amount: number }
+export interface Tender {
+  method: string;
+  amount: number;
+}
 
 export interface Promotion {
   scheme: string | null;
@@ -50,6 +53,8 @@ export interface Bill {
   tenders: Tender[];
   promotions: Promotion[];
   items: BillItem[];
+  /** synthetic bill from the built-in demo set — never exported, removable in one action */
+  demo?: boolean;
   /** fetched e-bill text, kept because the digibill link expires (~3 months) */
   rawText?: string;
   transcribedFrom?: string;
@@ -78,4 +83,18 @@ export interface IngestResult {
   status: "added" | "duplicate" | "rejected";
   ref: string;
   checks: CheckResult[];
+}
+
+export type AuditType = "added" | "duplicate" | "rejected" | "import" | "export" | "seed" | "removed";
+export type InputPath = "ebill" | "receipt" | "import" | "seed";
+
+/** Append-only record of what happened to the ledger (US-17). Informational: the
+ * ledger is local, so this is a diary, not tamper-proof evidence (see threat model). */
+export interface AuditEvent {
+  id?: number;
+  at: string; // ISO timestamp
+  type: AuditType;
+  ref?: string;
+  via?: InputPath;
+  detail?: string;
 }
