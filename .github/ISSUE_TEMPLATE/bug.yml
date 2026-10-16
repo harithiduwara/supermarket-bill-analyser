@@ -1,0 +1,17 @@
+name: Bug
+description: Something does not work as the requirements say
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: What you did, what you expected, what you saw }
+    validations: { required: true }
+  - type: input
+    id: env
+    attributes: { label: Browser and version }
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Data safety
+      options:
+        - label: I have exported my ledger (Settings → Export) before trying anything else

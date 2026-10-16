@@ -1,3 +1,10 @@
 node_modules
 dist
+coverage
+playwright-report
+test-results
 *.tsbuildinfo
+__pycache__
+*.pyc
+# real bills never go in the repo: keep them here, outside version control (docs/adr/0007)
+private/

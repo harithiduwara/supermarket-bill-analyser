@@ -14,5 +14,7 @@ export function round(x: number, digits = 2): number {
 
 export const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
 
-export const money = (x: number): string =>
-  x.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Cached: Number.prototype.toLocaleString builds a formatter on every call, which made
+// reconcile() ~10x slower on a 5,000-bill ledger.
+const fmt = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+export const money = (x: number): string => fmt.format(x);

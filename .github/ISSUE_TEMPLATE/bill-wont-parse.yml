@@ -1,0 +1,26 @@
+name: A real bill will not parse or reconcile
+description: A Keells e-bill or receipt fails a check
+labels: [parser, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste a full bill here** — it contains your purchases, store, time and the last digits of a card.
+        Describe the failure; redact item names and card digits; keep the numbers that matter for the arithmetic.
+  - type: dropdown
+    id: kind
+    attributes:
+      { label: Input, options: [Keells e-bill (pasted text), Keells e-bill (pasted HTML), Photo receipt] }
+    validations: { required: true }
+  - type: textarea
+    id: check
+    attributes:
+      { label: Which check failed, description: "Copy the failing check and its arithmetic from the screen" }
+    validations: { required: true }
+  - type: textarea
+    id: layout
+    attributes:
+      {
+        label: What looks different about this bill,
+        description: "A new section, a different layout, a new store code, a new payment type…",
+      }

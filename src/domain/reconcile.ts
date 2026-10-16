@@ -123,8 +123,6 @@ export function reconcile(b: Bill): CheckResult[] {
   return checks;
 }
 
-export const allPass = (checks: CheckResult[]): boolean =>
-  checks.every((c) => !c.applicable || c.ok);
+export const allPass = (checks: CheckResult[]): boolean => checks.every((c) => !c.applicable || c.ok);
 
-export const failures = (checks: CheckResult[]): CheckResult[] =>
-  checks.filter((c) => c.applicable && !c.ok);
+export const failures = (checks: CheckResult[]): CheckResult[] => checks.filter((c) => c.applicable && !c.ok);

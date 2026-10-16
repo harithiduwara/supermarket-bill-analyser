@@ -9,20 +9,22 @@ transcription — every line and every total is recomputed.
 Input format (see reference/receipt-template.json):
 
     {
-      "ref": "GLO546052",
+      "ref": "GLO900001",
       "source": "glomark",
-      "store": "Glomark Kottawa",
-      "store_code": "14006",
-      "date": "2026-09-02",
+      "store": "Glomark Demo Branch",
+      "store_code": "90000",
+      "date": "2026-06-17",
       "time": "18:56",
-      "points_earned": 53.97,
-      "points_balance_printed": 195,
+      "points_earned": 0.9,
+      "points_balance_printed": 100,
       "loyalty_scheme": "Softlogic One",
-      "printed": {"gross": 17655.86, "discount": 3823.22, "net": 13832.64},
-      "tenders": [{"method": "Visa Credit Card-1811", "amount": 13832.64}],
+      "printed": {"gross": 250.50, "discount": 25.00, "net": 225.50},
+      "tenders": [{"method": "Visa Credit Card-0000", "amount": 225.50}],
       "lines": [
-        {"code": "310129", "name": "GARLIC", "rate": 920.00, "qty": 0.182,
-         "discount": 41.86, "amount": 125.58, "scheme": "Power Hours 25%"}
+        {"code": "100001", "name": "RICE 5KG", "rate": 100.00, "qty": 2,
+         "discount": 25.00, "amount": 175.00, "scheme": "Power Hours 25%"},
+        {"code": "100002", "name": "SOAP", "rate": 50.50, "qty": 1,
+         "discount": 0.00, "amount": 50.50, "scheme": null}
       ]
     }
 
@@ -30,7 +32,7 @@ Input format (see reference/receipt-template.json):
 `amount` is the post-discount figure from the receipt.
 
 Usage:
-    python3 transcribe_receipt.py receipts/GLO546052.json --outdir parsed
+    python3 transcribe_receipt.py receipts/GLO900001.json --outdir parsed
 """
 import argparse
 import json

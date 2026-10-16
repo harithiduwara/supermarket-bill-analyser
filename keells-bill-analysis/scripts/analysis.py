@@ -51,21 +51,22 @@ def _coconut(code, name):
 
 GLOMARK_SCHEMES = {
     "seylan": dict(
-        label="Seylan CC 25%", cap=None, seen="12-Sep-2026 (Sat)",
+        label="Seylan CC 25%", cap=None, seen="one bill, a Saturday",
         excludes="carrier bags only",
         excl=lambda c, n: _bag(c, n)),
     "power": dict(
-        label="Power Hours 25%", cap=None, seen="02-Sep-2026 (Wed)",
+        label="Power Hours 25%", cap=None, seen="one bill, a Wednesday",
         excludes="bags, UHT and powdered milk, eggs",
         excl=lambda c, n: _bag(c, n) or _milk_staple(c, n) or _egg_staple(c, n)),
     "sampath": dict(
-        label="Sampath CC 25%", cap=2500.00, seen="24-Sep-2026 (Thu)",
+        label="Sampath CC 25%", cap=2500.00, seen="one bill, a Thursday",
         excludes="bags, UHT milk, eggs, fresh meat, coconut",
         excl=lambda c, n: _bag(c, n) or _milk_staple(c, n) or _egg_staple(c, n)
         or _fresh_meat(c, n) or _coconut(c, n)),
 }
 # Which scheme each observed Glomark bill actually ran on.
-OBSERVED_ON = {"GLO546052": "power", "GLO225159": "seylan", "GLO549921": "sampath"}
+# Which scheme each observed Glomark bill ran on (the synthetic demo refs; real refs go here for a private ledger).
+OBSERVED_ON = {"GLO900001": "power", "GLO900002": "seylan", "GLO900003": "sampath"}
 
 
 def glomark_base(bill, scheme):
@@ -101,8 +102,8 @@ def keells_fresh_fired(bill):
 def item_promo_excess(bill):
     """Discount on a line beyond what the 25% scheme alone would give.
 
-    A line can carry its own promotion on top of the bank scheme — on 02-Sep a
-    hamburger bun took 40% under "MULTIPLE PROMOTION" while everything else took
+    A line can carry its own promotion on top of the bank scheme — on one
+    bill a hamburger bun took 40% under "MULTIPLE PROMOTION" while everything else took
     25%. Only the excess above 25% belongs to that separate promotion, so the
     scheme model is judged on the rest.
     """
@@ -387,8 +388,8 @@ def _opportunity(wb, bills, keells, glomark, card_gain, S):
     r += 2
     for note in [
         "These do not simply add up:",
-        "  - on 24-Sep the cap loss sits inside the card-choice figure; counting both",
-        "    double-counts about Rs 142",
+        "  - on a capped Sampath bill the cap loss sits inside the card-choice figure;",
+        "    counting both double-counts the capped amount",
         "  - perishables cannot always wait for a Sunday, so the fresh figure is the",
         "    full theoretical amount rather than a realistic saving",
         "  - the Glomark figures depend on exclusion lists derived from one bill each",
