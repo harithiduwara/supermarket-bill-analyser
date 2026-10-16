@@ -23,6 +23,15 @@ test.describe("US-19 capture on a phone (360 px)", () => {
     });
   }
 
+  test("US-28 the create-profile and sign-in screens fit with no horizontal scroll", async ({ page }) => {
+    await page.goto("/#/");
+    await expect(page.getByRole("heading", { level: 1, name: "Create your profile" })).toBeVisible();
+    expect(await noHorizontalScroll(page)).toBe(true);
+    await page.getByRole("button", { name: "I already have a profile" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Sign in" })).toBeVisible();
+    expect(await noHorizontalScroll(page)).toBe(true);
+  });
+
   test("the receipt verification form fits and is usable one-handed", async ({ page }) => {
     await openApp(page, "#/add/receipt");
     await page.getByRole("button", { name: "Enter by hand instead" }).click();

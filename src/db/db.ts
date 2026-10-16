@@ -63,6 +63,9 @@ export class DexieStore implements LedgerStore {
   async events(limit = 500) {
     return this.db.events.orderBy("id").reverse().limit(limit).toArray();
   }
+  close() {
+    this.db.close();
+  }
   async getMeta(key: string) {
     return (await this.db.meta.get(key))?.value;
   }

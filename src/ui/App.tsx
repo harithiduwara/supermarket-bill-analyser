@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DexieStore } from "../db/db";
 import type { Bill } from "../domain/types";
 import { requestPersistence } from "../storage";
+import type { Unlocked } from "./auth/AuthGate";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Icon } from "./components/Icon";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -59,16 +59,16 @@ const TITLES: Record<Route["name"], string> = {
   notfound: "Page not found",
 };
 
-export function App() {
+export function App(u: Unlocked) {
   return (
     <ErrorBoundary>
-      <Shell />
+      <Shell {...u} />
     </ErrorBoundary>
   );
 }
 
-function Shell() {
-  const store = useMemo(() => new DexieStore(), []);
+function Shell({ session, vault, lock, autolock, setAutolock }: Unlocked) {
+  const store = session.store;
   const [bills, setBills] = useState<Bill[] | null>(null);
   const [fatal, setFatal] = useState("");
   const { toast, view: toastView } = useToasts();
@@ -114,8 +114,8 @@ function Shell() {
   }, [route, routeKey, loaded]);
 
   const ctx = useMemo(
-    () => (bills ? { store, bills, refresh, toast } : null),
-    [store, bills, refresh, toast],
+    () => (bills ? { store, bills, refresh, toast, session, vault, lock, autolock, setAutolock } : null),
+    [store, bills, refresh, toast, session, vault, lock, autolock, setAutolock],
   );
 
   return (
@@ -161,7 +161,7 @@ function Shell() {
               {bills ? `Ledger: ${bills.length} ${bills.length === 1 ? "bill" : "bills"}` : "Ledger: loading"}
             </p>
             <p className="side-note">
-              <Icon name="lock" size={14} /> Stored on this device only
+              <Icon name="lock" size={14} /> Encrypted on this device
             </p>
           </div>
         </aside>
@@ -170,6 +170,15 @@ function Shell() {
             <a className="brand mobile-brand" href={href.workbook}>
               Grocery ledger
             </a>
+            <span className="who muted small">{session.email}</span>
+            <button
+              type="button"
+              className="btn small"
+              onClick={lock}
+              title="Lock this profile. You will sign in again to see your bills."
+            >
+              <Icon name="lock" size={16} /> Lock
+            </button>
             <ThemeToggle />
           </header>
           <main id="main">

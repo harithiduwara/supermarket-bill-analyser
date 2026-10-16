@@ -5,6 +5,7 @@ import { settings } from "../../settings";
 import { requestPersistence, storageStatus, type StorageStatus } from "../../storage";
 import { Field } from "../components/Field";
 import { PageHeader } from "../components/PageHeader";
+import { SecurityCard } from "./SecurityCard";
 import { useApp } from "../context";
 import { fmtDateTime } from "../format";
 import { href } from "../router";
@@ -69,6 +70,7 @@ export function SettingsPage({ onChanged }: { onChanged: () => Promise<void> }) 
     <>
       <PageHeader title="Settings & backup" lead="Everything lives on this device. Back it up." />
 
+      <SecurityCard onChanged={onChanged} />
       <section className="card" aria-labelledby="bk">
         <h2 id="bk">Backup</h2>
         <p>

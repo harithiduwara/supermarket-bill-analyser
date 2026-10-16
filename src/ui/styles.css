@@ -475,6 +475,7 @@ label.field-label {
 }
 input[type="text"],
 input[type="search"],
+input[type="email"],
 input[type="password"],
 input[type="date"],
 input[type="time"],
@@ -1101,4 +1102,130 @@ details.filters-wrap[open] > summary::before {
 
 td[data-label="Date"] {
   white-space: nowrap;
+}
+
+/* sign-in / profile screens */
+.auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: var(--bg);
+  position: relative;
+}
+.auth-top {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+}
+.auth-card h1 {
+  font-size: 1.4rem;
+  margin: 12px 0 12px;
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+.auth-brand .logo {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.stack {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.btn.block {
+  width: 100%;
+  margin-top: 6px;
+}
+.auth-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-top: 14px;
+}
+.linklike {
+  all: unset;
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: underline;
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+}
+.linklike:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.auth-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+.check input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.recovery {
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  background: var(--surface-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  word-break: break-all;
+  user-select: all;
+}
+.who {
+  margin-right: auto;
+}
+@media (max-width: 720px) {
+  .who {
+    display: none;
+  }
+  .mobile-brand {
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .auth {
+    align-items: start;
+    padding-top: 60px;
+  }
+  .auth-card {
+    padding: 22px 18px;
+  }
 }

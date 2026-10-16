@@ -19,8 +19,36 @@ export type StartingData =
   | "empty"; //    a brand-new visitor
 
 /** Open the app. Every test gets a fresh browser profile, so the ledger starts EMPTY; choose what to put in it. */
+/** Label text of a required field includes a decorative " *"; match the name exactly regardless. */
+export const lbl = (name: string): RegExp => new RegExp(`^${name}( \\*)?$`);
+
+export const TEST_EMAIL = "test.user@example.com";
+export const TEST_PASSWORD = "correct horse battery staple";
+
+/** Create the profile on the "Create your profile" screen and get past the recovery-key step. Returns the key. */
+export async function registerProfile(
+  page: Page,
+  email = TEST_EMAIL,
+  password = TEST_PASSWORD,
+): Promise<string> {
+  await expect(page.getByRole("heading", { level: 1, name: "Create your profile" })).toBeVisible();
+  await page.getByLabel(lbl("Email")).fill(email);
+  await page.getByLabel(lbl("Password")).fill(password);
+  await page.getByLabel(lbl("Confirm password")).fill(password);
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Save your recovery key" })).toBeVisible();
+  const key = (await page.getByLabel("Your recovery key").innerText()).trim();
+  await page.getByLabel(/I have saved my recovery key/).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  return key;
+}
+
+/** Open the app. A fresh browser profile has no encrypted profile yet, so the first call creates one and stays in it. */
 export async function openApp(page: Page, hash = "#/ledger", data: StartingData = "workbook"): Promise<void> {
   await page.goto("/#/");
+  const h1 = page.getByRole("heading", { level: 1 });
+  await expect(h1).toBeVisible();
+  if ((await h1.innerText()).includes("Create your profile")) await registerProfile(page);
   await expect(page.getByRole("heading", { level: 1, name: "Workbook" })).toBeVisible();
   await expect(page.getByText("Loading your ledger")).toHaveCount(0);
   const seeded = await page.evaluate(() => sessionStorage.getItem("test-seeded"));
@@ -40,9 +68,6 @@ export async function openApp(page: Page, hash = "#/ledger", data: StartingData 
     await expect(page.getByText("Loading your ledger")).toHaveCount(0);
   }
 }
-
-/** Label text of a required field includes a decorative " *"; match the name exactly regardless. */
-export const lbl = (name: string): RegExp => new RegExp(`^${name}( \\*)?$`);
 
 export const PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",

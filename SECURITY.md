@@ -7,7 +7,7 @@ You can expect an acknowledgement within a week.
 
 ## What this app is, security-wise
 
-A static, browser-only app. There is no server of ours: no accounts, no database, no telemetry. The ledger lives
+A static, browser-only app. There is no server of ours: no server-side accounts, no database, no telemetry (profiles are local and encrypted: ADR-0008). The ledger lives
 in the browser's IndexedDB. The only network egress is to `api.anthropic.com`, and only when you press “Read” on
 a receipt photo. See [`docs/threat-model.md`](docs/threat-model.md) and [`docs/adr/0004`](docs/adr/0004-bring-your-own-api-key.md).
 

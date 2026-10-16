@@ -43,6 +43,14 @@ const routes: { name: string; hash: string; prepare?: (p: Page) => Promise<void>
   },
   { name: "activity", hash: "#/activity" },
   { name: "settings", hash: "#/settings" },
+  {
+    name: "settings with the change-password panel open",
+    hash: "#/settings",
+    prepare: async (p) => {
+      await p.getByRole("button", { name: "Change password" }).click();
+      await p.getByLabel(lbl("Current password")).waitFor();
+    },
+  },
   { name: "not found", hash: "#/nope" },
 ];
 

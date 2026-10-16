@@ -29,7 +29,7 @@ reconciliation; idempotent ledger; derived analysis (9 views); backup/restore; X
 
 **Out of scope (and why it matters for the architecture):**
 
-- Authentication, multi-user, roles, SSO, server-side storage, multi-device sync, email ingestion.
+- Roles, SSO, server-side storage, multi-device sync, email ingestion. (Local encrypted profiles are in scope: US-28.)
   These need a backend. The product is deliberately a static, browser-only app (ADR-0001), so they are
   **Won't (this release)**, not omitted by accident. The migration path is recorded in ADR-0001.
 - Budgets, alerts, a mobile app.
@@ -153,6 +153,23 @@ As P1, I import my previously exported workbook, then add new bills, so that I n
 - Given a phone, then the same destinations are a bottom tab bar with icons and short labels.
 - Given I choose light or dark, then the choice is remembered on this device; "system" follows the device again.
 
+**US-28 Encrypted profiles on this device** — Must · P1 · 🔨
+
+- Given a new visitor, then they must create a profile (email + password) before anything else; the app shows no
+  ledger, and reads none, until a profile is unlocked.
+- Given I create a profile, then I am shown a recovery key once and cannot continue until I say it is saved; I am told
+  plainly that without the password and the recovery key nobody can recover the bills.
+- Given I sign in with a wrong password or an unknown email, then I get the same message either way and see nothing.
+- Given I forgot my password, then my recovery key lets me choose a new one, keeps every bill, and issues a new
+  recovery key (the old one stops working).
+- Given I leave the app idle, then it locks after the time I chose (5, 15, 30 or 60 minutes); a reload of the same tab
+  stays signed in, closing the tab does not; I can lock at any time.
+- Given I change my password, make a new recovery key or delete my profile, then the current password is required;
+  deleting removes every bill, photo and activity record from the device.
+- Given bills stored before profiles existed, then I can move them into my profile (encrypted, original deleted only
+  after the copy is checked) or delete them.
+- Given two profiles on one device, then neither can see the other's bills.
+
 **US-17 Audit trail** — Should · P2 · 🔨
 
 - Given any ingest, import, export or seed, then an append-only event is recorded with time, type, reference,
@@ -181,26 +198,27 @@ are credits, not spend. Every Keells total carries this caveat.
 page scroll; tap targets ≥ 44 px.
 **US-20 Accessible** — Must · P1 · 🔨 WCAG 2.2 AA: keyboard-only operation, visible focus, labelled controls,
 status not conveyed by colour alone, announced results, no contrast failures, reduced-motion respected.
-**US-21 Multi-device sync, multiple users, SSO** — Won't (this release) · ⛔ See ADR-0001.
+**US-21 Multi-device sync, SSO, server accounts** — Won't (this release) · ⛔ See ADR-0001 and ADR-0008.
 
 ## 6. Non-functional requirements
 
-| ID     | Category        | Requirement                                                                                                                         | Verified by                                                                               |
-| ------ | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| NFR-01 | Correctness     | Reconciliation tolerance is 0.02 and is never widened                                                                               | unit tests (`reconcile.test`)                                                             |
-| NFR-02 | Correctness     | The TS port reproduces the Python rules (synthetic round-trip tests; optional private parity run, ADR-0007)                         | `seed.test`                                                                               |
-| NFR-03 | Integrity       | Nothing derived is stored; imports and OCR output are validated as untrusted input                                                  | `audit.test` (import), `ocr.test` (OCR output)                                            |
-| NFR-04 | Security        | CSP restricts scripts to self and network to api.anthropic.com                                                                      | e2e (no CSP violations)                                                                   |
-| NFR-05 | Security        | API key is held for the browser tab only by default; persisting it is opt-in and revocable                                          | `settings.test`, e2e `settings.spec`                                                      |
-| NFR-06 | Privacy         | Bills never leave the device; the app makes no third-party requests; only receipt photos go to the OCR provider, on explicit action | e2e `security.spec` (no third-party requests)                                             |
-| NFR-07 | Accessibility   | Zero axe violations on every route (WCAG 2.2 AA tags)                                                                               | e2e `a11y.spec`                                                                           |
-| NFR-08 | Performance     | 5,000-bill ledger lists in < 1 s (paged); main JS bundle ≤ 120 kB gzip                                                              | `ledgerView.test` (query time); CI bundle-size gate (not a test title)                    |
-| NFR-09 | Maintainability | Lint and formatting clean; domain coverage ≥ 90% lines                                                                              | CI: lint, prettier, coverage thresholds (not a test title)                                |
-| NFR-10 | Supply chain    | Dependency audit (high+) and CodeQL run on every push; Dependabot weekly                                                            | CI: audit, CodeQL, Dependabot (not a test title)                                          |
-| NFR-11 | Resilience      | Schema upgrades of the local DB preserve existing bills                                                                             | `migration.test`                                                                          |
-| NFR-12 | Honesty         | Every Keells total carries the capture-gap caveat; every inferred rule states its evidence and observation count                    | e2e `ledger.spec` (caveat on every Keells total); review checklist for rules from Phase 2 |
-| NFR-13 | Security        | Workbook import is bounded and inert: size and row caps, `.xlsx` only, formulas never evaluated, unknown sheets ignored             | `xlsx.test`, `workbook.test`                                                              |
-| NFR-14 | Integrity       | Export → import → export is lossless and repeatable                                                                                 | `xlsx.test`, `workbook.test`, e2e `workbook.spec`                                         |
+| ID     | Category        | Requirement                                                                                                                                                                       | Verified by                                                                               |
+| ------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| NFR-01 | Correctness     | Reconciliation tolerance is 0.02 and is never widened                                                                                                                             | unit tests (`reconcile.test`)                                                             |
+| NFR-02 | Correctness     | The TS port reproduces the Python rules (synthetic round-trip tests; optional private parity run, ADR-0007)                                                                       | `seed.test`                                                                               |
+| NFR-03 | Integrity       | Nothing derived is stored; imports and OCR output are validated as untrusted input                                                                                                | `audit.test` (import), `ocr.test` (OCR output)                                            |
+| NFR-04 | Security        | CSP restricts scripts to self and network to api.anthropic.com                                                                                                                    | e2e (no CSP violations)                                                                   |
+| NFR-05 | Security        | API key is held for the browser tab only by default; persisting it is opt-in and revocable                                                                                        | `settings.test`, e2e `settings.spec`                                                      |
+| NFR-06 | Privacy         | Bills never leave the device; the app makes no third-party requests; only receipt photos go to the OCR provider, on explicit action                                               | e2e `security.spec` (no third-party requests)                                             |
+| NFR-07 | Accessibility   | Zero axe violations on every route (WCAG 2.2 AA tags)                                                                                                                             | e2e `a11y.spec`                                                                           |
+| NFR-08 | Performance     | 5,000-bill ledger lists in < 1 s (paged); main JS bundle ≤ 120 kB gzip                                                                                                            | `ledgerView.test` (query time); CI bundle-size gate (not a test title)                    |
+| NFR-09 | Maintainability | Lint and formatting clean; domain coverage ≥ 90% lines                                                                                                                            | CI: lint, prettier, coverage thresholds (not a test title)                                |
+| NFR-10 | Supply chain    | Dependency audit (high+) and CodeQL run on every push; Dependabot weekly                                                                                                          | CI: audit, CodeQL, Dependabot (not a test title)                                          |
+| NFR-11 | Resilience      | Schema upgrades of the local DB preserve existing bills                                                                                                                           | `migration.test`                                                                          |
+| NFR-12 | Honesty         | Every Keells total carries the capture-gap caveat; every inferred rule states its evidence and observation count                                                                  | e2e `ledger.spec` (caveat on every Keells total); review checklist for rules from Phase 2 |
+| NFR-13 | Security        | Workbook import is bounded and inert: size and row caps, `.xlsx` only, formulas never evaluated, unknown sheets ignored                                                           | `xlsx.test`, `workbook.test`                                                              |
+| NFR-15 | Security        | Bills, photos, activity and settings are encrypted at rest (AES-GCM) under keys derived from the password; stored ids reveal no references; keys are non-extractable while in use | `vault.test`, e2e `auth.spec`                                                             |
+| NFR-14 | Integrity       | Export → import → export is lossless and repeatable                                                                                                                               | `xlsx.test`, `workbook.test`, e2e `workbook.spec`                                         |
 
 ## 7. Risks
 

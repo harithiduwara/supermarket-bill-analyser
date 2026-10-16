@@ -79,7 +79,9 @@ photo is sent, only when you press Read. The model is configurable; default `cla
 
 ## Known limits (stated, not hidden)
 
-- **Local only.** One browser, one user. No sync, no accounts (ADR-0001). Export regularly.
+- **Local and encrypted.** Each person creates a profile (email + password) on their own device; bills are encrypted
+  in the browser with a key made from the password, and a recovery key is the only way back if it is forgotten
+  (ADR-0008). No server, no sync, no email is sent (ADR-0001). Export regularly: an exported workbook is not encrypted.
 - **Editing an existing bill in Excel has no effect** — import never overwrites; a differing copy is reported (correcting a bill is US-16, not built).
 - **The analysis sheets** (categories, scheme models, capture gap…) are not in the workbook yet; they will be added as extra sheets and old workbooks will keep importing.
 - **E-bill content is pasted**, not fetched (ADR-0002). Converting pasted HTML is **unverified** against the live

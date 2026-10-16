@@ -4,6 +4,13 @@ All notable changes. Format: [Keep a Changelog](https://keepachangelog.com/en/1.
 
 ## [Unreleased]
 
+### Added
+
+- **Encrypted profiles on this device** (US-28, NFR-15, ADR-0008): create a profile with email and password; bills,
+  photos, activity and settings are encrypted in the browser (AES-GCM, PBKDF2 600k, non-extractable keys); recovery key
+  for a forgotten password; idle auto-lock (5/15/30/60 min) and Lock now; a reload keeps the tab signed in, closing it
+  does not; change password, new recovery key, delete profile; move older unencrypted bills into a profile. No server.
+
 ### Security
 
 - **Removed real customer data** that shipped as starting data and test fixtures in the first public deploy

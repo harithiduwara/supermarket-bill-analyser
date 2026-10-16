@@ -16,7 +16,7 @@ test.describe("US-27 app shell and colour theme", () => {
       "page",
     );
     await expect(page.getByText("Ledger: 24 bills")).toBeVisible();
-    await expect(page.getByText("Stored on this device only")).toBeVisible();
+    await expect(page.getByText("Encrypted on this device")).toBeVisible();
   });
 
   test("the theme can be forced light or dark, is remembered, and follows the system again", async ({
